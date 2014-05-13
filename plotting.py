@@ -30,16 +30,22 @@ def hist(grouped, var=None, *args, **kwargs):
         if var!=None:
             _series_hist(grouped[var], *args, **kwargs)
         else:
-            for var, series in grouped._iterate_column_groupbys():
-                plt.figure()
+            fig = plt.figure()
+            n_plots = len(grouped)
+            for i, (var, series) in enumerate(grouped._iterate_column_groupbys()):
+                print "Doing variable: %s" % var
+                plt.subplot(1, n_plots, i)
                 try:
                     _series_hist(series, *args, **kwargs)
                     plt.xlabel(var)
                 except TypeError as e:
                     print "Failed to plot %s" % var
+                finally:
+                    pass
+                    #plt.close(fig)
 
 
-def _series_hist(grouped, ax=None, normed=False, normalize=False, *args, **kwargs):
+def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -51,7 +57,7 @@ def _series_hist(grouped, ax=None, normed=False, normalize=False, *args, **kwarg
     normed_or_normalize = normed or normalize
 
     if grouped.obj.dtype=='float64':
-        _series_hist_float(grouped, ax, normed=normed_or_normalize, *args, **kwargs)
+        _series_hist_float(grouped, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
     else:
         _series_hist_nominal(grouped, ax, normalize=normed_or_normalize, *args, **kwargs)
 
@@ -83,15 +89,12 @@ def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False
         srs.hist(ax=ax, color=color, label=label, **kwargs)
 
 
-def _series_hist_nominal(grouped, ax=None, autobin=False, normalize=False, *args, **kwargs):
+def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
     for each of the groups.
     """
-
-    if ax is None:
-        ax = plt.gca()
 
     color_cycle = ax._get_lines.color_cycle
 
