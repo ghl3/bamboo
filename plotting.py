@@ -39,7 +39,7 @@ def hist(grouped, var=None, *args, **kwargs):
                     print "Failed to plot %s" % var
 
 
-def _series_hist(grouped, ax=None, nominal=False, autobin=False, *args, **kwargs):
+def _series_hist(grouped, ax=None, normed=False, normalize=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -48,52 +48,64 @@ def _series_hist(grouped, ax=None, nominal=False, autobin=False, *args, **kwargs
     if ax is None:
         ax = plt.gca()
 
-    ## color_cycle is only needed when nominal=True
-    color_cycle = ax._get_lines.color_cycle
+    normed_or_normalize = normed or normalize
+
+    if grouped.obj.dtype=='float64':
+        _series_hist_float(grouped, ax, normed=normed_or_normalize, *args, **kwargs)
+    else:
+        _series_hist_nominal(grouped, ax, normalize=normed_or_normalize, *args, **kwargs)
+
+    plt.legend(loc='best', fancybox=True)
+
+
+def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False, *args, **kwargs):
+    """
+    Takes a pandas.SeriesGroupBy
+    and plots histograms of the variable 'var'
+    for each of the groups.
+    """
 
     if autobin and 'bins' not in kwargs:
         kwargs['bins'] = get_variable_binning(grouped.obj)
+
+    color_cycle = ax._get_lines.color_cycle
 
     for (color, (key, srs)) in zip(color_cycle,grouped):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
-            #del kwargs['label']
         else:
             label = key
 
         if 'color' in kwargs.keys():
             color = kwargs['color']
-            #del kwargs['color']
 
-        if nominal:
-            vc = srs.value_counts(normalize=True)
+        srs.hist(ax=ax, color=color, label=label, **kwargs)
 
-            ## If srs is boolean, then sort the vc indices such that
-            ## True comes before False even when False occurs more
-            ## frequently.
-            suniq = sorted(srs.unique())
-            if (suniq == [0,1]) or (suniq == [False,True]):
-                vc = vc.sort_index()
 
-            vc.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
+def _series_hist_nominal(grouped, ax=None, autobin=False, normalize=False, *args, **kwargs):
+    """
+    Takes a pandas.SeriesGroupBy
+    and plots histograms of the variable 'var'
+    for each of the groups.
+    """
+
+    if ax is None:
+        ax = plt.gca()
+
+    color_cycle = ax._get_lines.color_cycle
+
+    for (color, (key, srs)) in zip(color_cycle,grouped):
+
+        if 'label' in kwargs.keys():
+            label = kwargs['label']
         else:
-            srs.hist(ax=ax, color=color, label=label, **kwargs)
-            #_series_hist_float(srs, ax=ax, *args, **kwargs)
-            #srs.hist(ax=ax, color=color, label=label, **kwargs)
+            label = key
 
-    plt.legend(loc='best', fancybox=True)
+        if 'color' in kwargs.keys():
+            color = kwargs['color']
 
-
-
-#def _series_hist_float(srs, ax, autobin=False, *args, **kwargs):
-
-
-
-
-
-
-#.dtype.dtype
+        srs.value_counts(normalize=normalize).plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
 
 
 def scatter(grouped, x, y, **kwargs):
