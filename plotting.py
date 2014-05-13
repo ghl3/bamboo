@@ -30,19 +30,18 @@ def hist(grouped, var=None, *args, **kwargs):
         if var!=None:
             _series_hist(grouped[var], *args, **kwargs)
         else:
-            fig = plt.figure()
-            n_plots = len(grouped)
-            for i, (var, series) in enumerate(grouped._iterate_column_groupbys()):
-                print "Doing variable: %s" % var
-                plt.subplot(1, n_plots, i)
+            for (var, series) in grouped._iterate_column_groupbys():
+                plt.figure()
                 try:
                     _series_hist(series, *args, **kwargs)
                     plt.xlabel(var)
                 except TypeError as e:
                     print "Failed to plot %s" % var
+                    print e
                 finally:
                     pass
-                    #plt.close(fig)
+    else:
+        pass
 
 
 def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False, *args, **kwargs):
