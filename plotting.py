@@ -39,7 +39,7 @@ def hist(grouped, var=None, *args, **kwargs):
                     print "Failed to plot %s" % var
 
 
-def _series_hist(grouped, ax=None, metrics=None, nominal=False, autobin=False, **kwargs):
+def _series_hist(grouped, ax=None, nominal=False, autobin=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -51,9 +51,10 @@ def _series_hist(grouped, ax=None, metrics=None, nominal=False, autobin=False, *
     ## color_cycle is only needed when nominal=True
     color_cycle = ax._get_lines.color_cycle
 
-    for (color, (key, srs)) in zip(color_cycle,grouped):
+    if autobin and 'bins' not in kwargs:
+        kwargs['bins'] = get_variable_binning(grouped.obj)
 
-        vals = srs[pd.notnull(srs)]
+    for (color, (key, srs)) in zip(color_cycle,grouped):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
@@ -77,11 +78,22 @@ def _series_hist(grouped, ax=None, metrics=None, nominal=False, autobin=False, *
 
             vc.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
         else:
-            if autobin and 'bins' not in kwargs:
-                kwargs['bins'] = get_variable_binning(vals)
             srs.hist(ax=ax, color=color, label=label, **kwargs)
+            #_series_hist_float(srs, ax=ax, *args, **kwargs)
+            #srs.hist(ax=ax, color=color, label=label, **kwargs)
 
     plt.legend(loc='best', fancybox=True)
+
+
+
+#def _series_hist_float(srs, ax, autobin=False, *args, **kwargs):
+
+
+
+
+
+
+#.dtype.dtype
 
 
 def scatter(grouped, x, y, **kwargs):
