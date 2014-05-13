@@ -16,68 +16,27 @@ class SkipPlot(Exception):
     pass
 
 
-"""
-for var in df.columns[:10]:
-    plt.figure()
-    mn = df[var].min()
-    mx = df[var].max()
-    width = (mx-mn) / 10
-    df.groupby('Label')[var].hist(alpha=0.5, bins=np.arange(mn, mx, width), normed=True)
-    plt.xlabel(var)
-"""
-
-def hist(grouped, var=None, ax=None, metrics=None, nominal=False, autobin=False, **kwargs):
+def hist(grouped, var=None, *args, **kwargs):
     """
     Takes a data frame (grouped by a variable)
     and plots histograms of the variable 'var'
     for each of the groups.
     """
-    if ax is None:
-        ax = plt.gca()
 
-    ## color_cycle is only needed when nominal=True
-    color_cycle = ax._get_lines.color_cycle
+    if isinstance(grouped, pd.core.groupby.SeriesGroupBy):
+        _series_hist(grouped, *args, **kwargs)
 
-    for (color, (key, grp)) in zip(color_cycle,grouped):
-
-        if isinstance(grp, pd.Series):
-            srs = grp
+    elif isinstance(grouped, pd.core.groupby.DataFrameGroupBy):
+        if var!=None:
+            _series_hist(grouped[var], *args, **kwargs)
         else:
-            if var==None:
-                print "Must supply a var when histing a DataFrame"
-                return
-            else:
-                srs = grp[var]
-
-        vals = srs[pd.notnull(srs)]
-
-        if 'label' in kwargs.keys():
-            label = kwargs['label']
-            #del kwargs['label']
-        else:
-            label = key
-
-        if 'color' in kwargs.keys():
-            color = kwargs['color']
-            #del kwargs['color']
-
-        if nominal:
-            vc = srs.value_counts(normalize=True)
-
-            ## If srs is boolean, then sort the vc indices such that
-            ## True comes before False even when False occurs more
-            ## frequently.
-            suniq = sorted(srs.unique())
-            if (suniq == [0,1]) or (suniq == [False,True]):
-                vc = vc.sort_index()
-
-            vc.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
-        else:
-            if autobin and 'bins' not in kwargs:
-                kwargs['bins'] = get_variable_binning(vals)
-            srs.hist(ax=ax, color=color, label=label, **kwargs)
-
-    plt.legend(loc='best', fancybox=True)
+            for var, series in grouped._iterate_column_groupbys():
+                plt.figure()
+                try:
+                    _series_hist(series, *args, **kwargs)
+                    plt.xlabel(var)
+                except TypeError as e:
+                    print "Failed to plot %s" % var
 
 
 def _series_hist(grouped, ax=None, metrics=None, nominal=False, autobin=False, **kwargs):
@@ -92,16 +51,7 @@ def _series_hist(grouped, ax=None, metrics=None, nominal=False, autobin=False, *
     ## color_cycle is only needed when nominal=True
     color_cycle = ax._get_lines.color_cycle
 
-    for (color, (key, grp)) in zip(color_cycle,grouped):
-
-        if isinstance(grp, pd.Series):
-            srs = grp
-        else:
-            if var==None:
-                print "Must supply a var when histing a DataFrame"
-                return
-            else:
-                srs = grp[var]
+    for (color, (key, srs)) in zip(color_cycle,grouped):
 
         vals = srs[pd.notnull(srs)]
 
@@ -132,7 +82,6 @@ def _series_hist(grouped, ax=None, metrics=None, nominal=False, autobin=False, *
             srs.hist(ax=ax, color=color, label=label, **kwargs)
 
     plt.legend(loc='best', fancybox=True)
-
 
 
 def scatter(grouped, x, y, **kwargs):
