@@ -24,7 +24,7 @@ def hist(grouped, var=None, *args, **kwargs):
         _series_hist(grouped, *args, **kwargs)
 
     elif isinstance(grouped, pd.core.groupby.DataFrameGroupBy):
-        if var!=None:
+        if var is not None:
             _series_hist(grouped[var], *args, **kwargs)
         else:
             for (var, series) in grouped._iterate_column_groupbys():
@@ -52,7 +52,7 @@ def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False,
 
     normed_or_normalize = normed or normalize
 
-    if grouped.obj.dtype in NUMERIC_TYPES: #('float64', 'int64'):
+    if grouped.obj.dtype in NUMERIC_TYPES:
         _series_hist_float(grouped, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
     else:
         _series_hist_nominal(grouped, ax, normalize=normed_or_normalize, *args, **kwargs)
@@ -60,7 +60,8 @@ def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False,
     plt.legend(loc='best', fancybox=True)
 
 
-def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False, *args, **kwargs):
+def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False,
+                       stacked=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -72,7 +73,7 @@ def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False
 
     color_cycle = ax._get_lines.color_cycle
 
-    for (color, (key, srs)) in zip(color_cycle,grouped):
+    for (color, (key, srs)) in zip(color_cycle, grouped):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
@@ -94,7 +95,7 @@ def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
 
     color_cycle = ax._get_lines.color_cycle
 
-    for (color, (key, srs)) in zip(color_cycle,grouped):
+    for (color, (key, srs)) in zip(color_cycle, grouped):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
@@ -128,7 +129,7 @@ def binner(divisor):
     down to the nearst factor of the divisor
     """
     def round_down(num):
-        return num - (num%divisor)
+        return num - (num % divisor)
     return round_down
 
 
@@ -145,7 +146,7 @@ def vals_in_range(vals, bins):
 
 
 def add_label(labels):
-    xy=(0.55, 0.95)
+    xy = (0.55, 0.95)
     for name, val in labels.iteritems():
         plt.annotate("{0}: {1}".format(name, val),
                      xy=xy, xycoords='axes fraction')
@@ -170,7 +171,7 @@ def get_variable_binning(var, nbins=10, int_bound=40):
     var_min = min(var)
     var_max = max(var)
 
-    if var_min==var_max:
+    if var_min == var_max:
         return np.array([var_min-0.5, var_max+0.5])
 
     # If all values are integers (not necessarily by type) between
@@ -187,14 +188,88 @@ def get_variable_binning(var, nbins=10, int_bound=40):
     p_02_exp = p_50 - (p_50 - p_02) * 1.15
     p_98_exp = p_50 + (p_98 - p_50) * 1.15
 
-    if (var_max > p_98_exp): var_max = p_98_exp
-    if (var_min < p_02_exp): var_min = p_02_exp
+    if (var_max > p_98_exp):
+        var_max = p_98_exp
+
+    if (var_min < p_02_exp):
+        var_min = p_02_exp
 
     bins = np.arange(nbins+1)/nbins * (var_max - var_min) + var_min
     return bins
 
 
-NUMERIC_TYPES = ('bool_','int_','intc','intp','int8',
-                  'int16','int32','int64', 'uint8',
-                  'uint16','uint32','uint64','float_',
-                  'float16','float32','float64')
+def boxplot(df, xaxis, yaxis):
+    """ Draw a boxplot using the
+    variables xaxis and yaxis.
+    Include ticks
+    """
+
+    if xaxis not in df:
+        print "x axis " + xaxis + " not in DataFrame: ", df
+        print df.columns
+        raise Exception()
+
+    if yaxis not in df:
+        print "y axis " + yaxis + " not in DataFrame: ", df
+        print df.columns
+        raise Exception()
+
+    from pandas.tools.plotting import boxplot_frame_groupby
+    boxplot_frame_groupby(df.groupby(xaxis)[yaxis], subplots=False)
+
+
+def stacked_counts_plot(df, xaxis, categories, ratio=False, **kwargs):
+    """
+    Draw a plot of the counts per category in categories
+    per bin of x-axis.
+
+    Convert this:
+    class  day
+    A      1
+    A      1
+    A      2
+    B      1
+    B      2
+
+    Into this:
+    A A B
+    A B
+    as a barplot
+    """
+
+    counts = df.groupby(xaxis)[categories].value_counts().unstack().fillna(0.)
+
+    if ratio:
+        denom = counts.sum(axis=1)
+        counts = counts.divide(denom, axis='index')
+
+    ax = plt.gca()
+    plot = counts.plot(kind="bar", stacked=True, subplots=False, ax=ax, **kwargs)
+    for container in plot.containers:
+        plt.setp(container, width=1)
+
+
+def _draw_stacked_plot(grouped, **kwargs):
+    """
+    Draw a vertical bar plot of multiple series
+    stacked on top of each other
+
+    Deals with some annoying pandas issues when
+    drawing a DataFrame
+    """
+
+    #color_cycle = ax._get_lines.color_cycle
+
+    series_dict = {}
+
+    for (key, srs) in grouped:
+        series_dict[key] = srs
+
+    df_for_plotting = pd.DataFrame(series_dict)
+    df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
+
+
+NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
+                 'int16', 'int32', 'int64', 'uint8',
+                 'uint16', 'uint32', 'uint64', 'float_',
+                 'float16', 'float32', 'float64')
