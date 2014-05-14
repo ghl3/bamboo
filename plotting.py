@@ -8,9 +8,6 @@ from math import floor, ceil
 
 import numpy as np
 
-import itertools
-
-import pdb
 
 class SkipPlot(Exception):
     pass
@@ -55,7 +52,7 @@ def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False,
 
     normed_or_normalize = normed or normalize
 
-    if grouped.obj.dtype=='float64':
+    if grouped.obj.dtype in NUMERIC_TYPES: #('float64', 'int64'):
         _series_hist_float(grouped, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
     else:
         _series_hist_nominal(grouped, ax, normalize=normed_or_normalize, *args, **kwargs)
@@ -85,7 +82,7 @@ def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        srs.hist(ax=ax, color=color, label=label, **kwargs)
+        srs.hist(ax=ax, color=color, label=label, normed=normed, **kwargs)
 
 
 def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
@@ -155,10 +152,19 @@ def add_label(labels):
         xy = (xy[0], xy[1]-0.04)
 
 
-def get_variable_binning(var, int_bound=40):
+def get_variable_binning(var, nbins=10, int_bound=40):
     """
     Get the binning of a variable.
     Deals with a number of special cases.
+    For smooth distributions most of the time the maximum (minimum)
+    occurs within 15% of the 98th (2nd) percentile, so we define
+    extreme outliers as:
+
+    if ( (var_max > p_50 + (p_98 - p_50) * 1.15) or
+         (var_min < p_50 - (p_50 - p_02) * 1.15) )
+
+    If an outlier is present, then use the expanded (by 15%) 98th
+    (or 2nd) percentile as the bin edge. Otherwise we use the actual extremum.
     """
 
     var_min = min(var)
@@ -167,28 +173,15 @@ def get_variable_binning(var, int_bound=40):
     if var_min==var_max:
         return np.array([var_min-0.5, var_max+0.5])
 
-    ## If all values are integers (not necessarily by type) between
-    ## -int_bound and +int_bound, then use unit spacing centered on
-    ## integers.
+    # If all values are integers (not necessarily by type) between
+    # -int_bound and +int_bound, then use unit spacing centered on
+    # integers.
     if var_min > -int_bound and var_max < int_bound:
 
         if all(np.equal(np.mod(var, 1), 0)):
             return np.arange(var_min-0.5, var_max+1.5, 1)
 
-    ## Detect extreme outliers by the following heuristic.
-
-    ## For smooth distributions most of the time the maximum (minimum)
-    ## occurs within 15% of the 98th (2nd) percentile, so we define
-    ## extreme outliers as:
-    ##
-    ## if ( (var_max > p_50 + (p_98 - p_50) * 1.15) or
-    ##      (var_min < p_50 - (p_50 - p_02) * 1.15) )
-    ##
-    ## If an outlier is present, then use the expanded (by 15%) 98th
-    ## (or 2nd) percentile as the bin edge. Otherwise we use the actual extremum.
-    ##
-    ## We always use evenly spaced binning, and 10 bins in total.
-
+    # Detect extreme outliers by the following heuristic.
     p_02, p_50, p_98 = np.percentile(var, (2, 50, 98))
 
     p_02_exp = p_50 - (p_50 - p_02) * 1.15
@@ -197,7 +190,11 @@ def get_variable_binning(var, int_bound=40):
     if (var_max > p_98_exp): var_max = p_98_exp
     if (var_min < p_02_exp): var_min = p_02_exp
 
-    bins = np.arange(11)/10.0 * (var_max - var_min) + var_min
+    bins = np.arange(nbins+1)/nbins * (var_max - var_min) + var_min
     return bins
 
 
+NUMERIC_TYPES = ('bool_','int_','intc','intp','int8',
+                  'int16','int32','int64', 'uint8',
+                  'uint16','uint32','uint64','float_',
+                  'float16','float32','float64')
