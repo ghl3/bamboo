@@ -36,8 +36,44 @@ def split(df, columns):
              if column not in left]
 
     return (df[left], df[right])
-    #partition_values = df.apply(partition_function, axis=1)
-    #return df.groupby(partition_values)
+
+
+def map_functions(df, functions):
+    """
+    Takes an input data frame and a map
+    of function names to functions that
+    each are to act row-wise on the
+    input dataframe.
+    Return a DataFrame whose columns are
+    the result of those functions on the
+    input dataframe.
+    functions - either a list of functions or
+    a map of names to functions
+    """
+
+    column_map = {}
+
+    try:
+        # If it's dict like
+        for name, func in functions.iteritems():
+            column_map[name] = df.apply(func, axis=1)
+    except AttributeError:
+            # Assume it's list like
+            for func in functions:
+                column_map[func.__name__] = df.apply(func, axis=1)
+
+    return pd.DataFrame(column_map, index=df.index)
+
+
+def with_new_columns(df, functions):
+    """
+    Take an input DataFrame and a set of functions
+    whose values represent new columns and return
+    the original DataFrame with the new columns
+    added based on mapping those functions over
+    the rows of the input DataFrame
+    """
+    return df.join(map_functions(df, functions))
 
 
 def get_numeric_features(df):
