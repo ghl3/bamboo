@@ -37,6 +37,7 @@ def hist(grouped, var=None, *args, **kwargs):
                     print e
                 finally:
                     pass
+
     else:
         pass
 
