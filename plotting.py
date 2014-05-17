@@ -8,6 +8,9 @@ from math import floor, ceil
 
 import numpy as np
 
+from subplots import PdfSubplots
+from matplotlib.backends.backend_pdf import PdfPages
+
 
 class SkipPlot(Exception):
     pass
@@ -274,3 +277,32 @@ NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
                  'int16', 'int32', 'int64', 'uint8',
                  'uint16', 'uint32', 'uint64', 'float_',
                  'float16', 'float32', 'float64')
+
+
+def save_grouped_hists(grouped, output_file, title=None, *args, **kwargs):
+    """
+    Take a grouped dataframe and save a pdf of
+    the histogrammed variables in that dataframe.
+    TODO: Can we abstract this behavior...?
+    """
+
+    pdf = PdfPages(output_file)
+
+    if title:
+        helpers.title_page(pdf, title)
+
+    subplots = PdfSubplots(pdf, 3, 3)
+
+    for (var, series) in grouped._iterate_column_groupbys():
+
+        subplots.next_subplot()
+        try:
+            _series_hist(series, *args, **kwargs)
+            subplots.end_iteration()
+            plt.xlabel(var)
+        except :
+            subplots.skip_subplot()
+
+    subplots.finalize()
+
+    pdf.close()
