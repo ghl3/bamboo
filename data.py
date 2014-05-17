@@ -5,6 +5,40 @@ import pandas as pd
 from plotting import NUMERIC_TYPES
 
 
+def exclude(df, exclude):
+    """
+    Return a DataFrame with a set of feature excluded
+    """
+    keep = [column for column in df.columns
+            if column not in exclude]
+    return df[keep]
+
+
+def partition(df, partition_function):
+    """
+    Separate a dataframe row-wise based on the
+    value of the supplied partition function
+    """
+
+    partition_values = df.apply(partition_function, axis=1)
+    return df.groupby(partition_values)
+
+
+def split(df, columns):
+    """
+    Separate a dataframe column-wise and turn a tuple
+    of all the given columns on one side and the remaining
+    columns on the other side
+    """
+
+    left = columns
+    right = [column for column in df.columns
+             if column not in left]
+
+    return (df[left], df[right])
+    #partition_values = df.apply(partition_function, axis=1)
+    #return df.groupby(partition_values)
+
 
 def get_numeric_features(df):
     float_feature_names = [feature for feature in df.columns
