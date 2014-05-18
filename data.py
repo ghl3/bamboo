@@ -24,18 +24,39 @@ def partition(df, partition_function):
     return df.groupby(partition_values)
 
 
-def split(df, columns):
+def split(df, columns, exclude=None):
     """
     Separate a dataframe column-wise and turn a tuple
     of all the given columns on one side and the remaining
     columns on the other side
     """
 
+    if exclude==None:
+        exclude = []
+
     left = columns
     right = [column for column in df.columns
-             if column not in left]
+             if column not in left
+             and column not in exclude]
 
     return (df[left], df[right])
+
+
+def take(df, var, exclude=None):
+    """
+    Separate a dataframe column-wise and turn a tuple
+    of a single column on one side and the remaining columns
+    on the other side.
+    """
+
+    if exclude==None:
+        exclude = []
+
+    rest = [column for column in df.columns
+             if column != var
+             and column not in exclude]
+
+    return (df[var], df[rest])
 
 
 def map_functions(df, functions):
