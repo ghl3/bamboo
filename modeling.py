@@ -14,9 +14,74 @@ import pydot
 from sklearn import tree
 
 from sklearn.cross_validation import StratifiedKFold
+from sklearn.metrics import roc_curve, auc
 
 from random import sample
 from plotting import hist
+
+import matplotlib.pyplot as plt
+
+
+def get_prediction(classifier, testing_features, testing_targets, retain_columns=None):
+    """
+    A better version of get_scores
+    Takes a classifier and a
+    """
+    predictions = classifier.predict(testing_features)
+
+    df_dict = {'predict':predictions,
+               testing_targets.name: testing_targets}
+
+    scores = classifier.predict_proba(testing_features).T
+    for idx, scores in enumerate(scores):
+        df_dict['predict_proba_%s' % idx] = scores
+
+    prediction = pd.DataFrame(df_dict)
+    prediction.set_index(testing_features.index)
+
+    if retain_columns is not None:
+        prediction = prediction.join(testing_features[retain_columns])
+
+    return prediction
+
+
+def print_roc_curve(y_true, y_scores):
+
+    fpr, tpr, thresholds = roc_curve(y_true, y_scores)
+    roc_auc = auc(fpr, tpr)
+
+    # Plot ROC curve
+    plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver operating characteristic example')
+    plt.legend(loc="lower right")
+
+
+def print_precision_recall_curve(y_true, y_scores):
+
+    precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
+    pr_auc = auc(recall, precision)
+
+    # Plot ROC curve
+    plt.plot(recall, precision, label='P-R curve (area = %0.2f)' % pr_auc)
+    plt.plot([0, 1], [1, 0], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver operating characteristic example')
+    plt.legend(loc="lower left")
+
+
+def print_distribution(clf, features, targets, fit_params=None, **kwargs):
+    score_groups = get_scores(targets, features, clf,
+                              StratifiedKFold(targets, n_folds=2), fit_params)
+    #bins = np.arange(0, 1.0, .05)
+    hist(score_groups[0].groupby('targets'), var='score', **kwargs)
 
 
 def balance_dataset(df, var='state', shrink=False, random_seed=None):
@@ -225,13 +290,6 @@ def get_scores(targets, features, clf, cv, balance=True):
         groups.append(grp)
 
     return groups
-
-
-def print_distribution(clf, features, targets, fit_params=None, **kwargs):
-    score_groups = get_scores(targets, features, clf,
-                              StratifiedKFold(targets, n_folds=2), fit_params)
-    #bins = np.arange(0, 1.0, .05)
-    hist(score_groups[0].groupby('targets'), var='score', **kwargs)
 
 
 def feature_importances(importances, features):
