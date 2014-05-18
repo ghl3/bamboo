@@ -298,8 +298,8 @@ def save_grouped_hists(grouped, output_file, title=None, *args, **kwargs):
         subplots.next_subplot()
         try:
             _series_hist(series, *args, **kwargs)
-            subplots.end_iteration()
             plt.xlabel(var)
+            subplots.end_iteration()
         except :
             subplots.skip_subplot()
 
