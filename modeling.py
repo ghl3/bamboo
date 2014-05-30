@@ -22,22 +22,23 @@ from plotting import hist
 import matplotlib.pyplot as plt
 
 
-def get_prediction(classifier, testing_features, testing_targets, retain_columns=None):
+def get_prediction(classifier, testing_features, testing_targets=None, retain_columns=None):
     """
     A better version of get_scores
     Takes a classifier and a
     """
     predictions = classifier.predict(testing_features)
 
-    df_dict = {'predict':predictions,
-               testing_targets.name: testing_targets}
+    df_dict = {'predict':predictions}
+    if testing_targets is not None:
+        df_dict[testing_targets.name] = testing_targets
 
     scores = classifier.predict_proba(testing_features).T
     for idx, scores in enumerate(scores):
         df_dict['predict_proba_%s' % idx] = scores
 
     prediction = pd.DataFrame(df_dict)
-    prediction.set_index(testing_features.index)
+    prediction = prediction.set_index(testing_features.index)
 
     if retain_columns is not None:
         prediction = prediction.join(testing_features[retain_columns])
@@ -57,7 +58,7 @@ def print_roc_curve(y_true, y_scores):
     plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic example')
+    plt.title('Receiver Operating Characteristic')
     plt.legend(loc="lower right")
 
 
@@ -71,16 +72,15 @@ def print_precision_recall_curve(y_true, y_scores):
     plt.plot([0, 1], [1, 0], 'k--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.0])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic example')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall curve')
     plt.legend(loc="lower left")
 
 
 def print_distribution(clf, features, targets, fit_params=None, **kwargs):
     score_groups = get_scores(targets, features, clf,
                               StratifiedKFold(targets, n_folds=2), fit_params)
-    #bins = np.arange(0, 1.0, .05)
     hist(score_groups[0].groupby('targets'), var='score', **kwargs)
 
 

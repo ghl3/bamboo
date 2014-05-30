@@ -2,7 +2,12 @@ from __future__ import division
 
 import pandas as pd
 
-from plotting import NUMERIC_TYPES
+
+NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
+                 'int16', 'int32', 'int64', 'uint8',
+                 'uint16', 'uint32', 'uint64', 'float_',
+                 'float16', 'float32', 'float64')
+
 
 
 def exclude(df, exclude):
@@ -57,6 +62,13 @@ def take(df, var, exclude=None):
              and column not in exclude]
 
     return (df[var], df[rest])
+
+
+def apply_all(df, *args):
+    res = {}
+    for arg in args:
+        res[arg.__name__] = df.apply(arg, axis=1)
+    return pandas.DataFrame(res)
 
 
 def map_functions(df, functions):
@@ -161,3 +173,19 @@ def get_index_rows(srs, indices):
             rows.append(i)
     return rows
 
+
+def group_by_binning(df, column, bins):
+    """
+    Return a dataframe grouped by the given
+    column being within the bins.
+    """
+
+    def grouper(x):
+
+        for i in range(len(bins[:-1])):
+            left, right = bins[i], bins[i+1]
+            if x >= left and x < right:
+                return "({}, {})".format(left, right)
+        return None
+
+    return df.groupby(df[column].map(grouper))

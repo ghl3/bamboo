@@ -11,6 +11,7 @@ import numpy as np
 from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
 
+from data import group_by_binning, NUMERIC_TYPES
 
 class SkipPlot(Exception):
     pass
@@ -87,7 +88,7 @@ def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        srs.hist(ax=ax, color=color, label=label, normed=normed, **kwargs)
+        srs.hist(ax=ax, color=color, label=str(label), normed=normed, **kwargs)
 
 
 def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
@@ -202,10 +203,12 @@ def get_variable_binning(var, nbins=10, int_bound=40):
     return bins
 
 
-def boxplot(df, xaxis, yaxis):
+def boxplot(df, xaxis, yaxis, bins=None):
     """ Draw a boxplot using the
     variables xaxis and yaxis.
     Include ticks
+    If 'bins' is not none, group the x-axis
+    variable into the supplied bins
     """
 
     if xaxis not in df:
@@ -219,7 +222,10 @@ def boxplot(df, xaxis, yaxis):
         raise Exception()
 
     from pandas.tools.plotting import boxplot_frame_groupby
-    boxplot_frame_groupby(df.groupby(xaxis)[yaxis], subplots=False)
+    if bins is None:
+        boxplot_frame_groupby(df.groupby(xaxis)[yaxis], subplots=False)
+    else:
+        boxplot_frame_groupby(group_by_binning(df, xaxis, bins)[yaxis], subplots=False)
 
 
 def stacked_counts_plot(df, xaxis, categories, ratio=False, **kwargs):
@@ -271,13 +277,6 @@ def _draw_stacked_plot(grouped, **kwargs):
 
     df_for_plotting = pd.DataFrame(series_dict)
     df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
-
-
-NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
-                 'int16', 'int32', 'int64', 'uint8',
-                 'uint16', 'uint32', 'uint64', 'float_',
-                 'float16', 'float32', 'float64')
-
 
 def save_grouped_hists(grouped, output_file, title=None, *args, **kwargs):
     """
