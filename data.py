@@ -9,7 +9,6 @@ NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
                  'float16', 'float32', 'float64')
 
 
-
 def exclude(df, exclude):
     """
     Return a DataFrame with a set of feature excluded
@@ -73,10 +72,9 @@ def apply_all(df, *args):
 
 def map_functions(df, functions):
     """
-    Takes an input data frame and a map
-    of function names to functions that
-    each are to act row-wise on the
-    input dataframe.
+    Takes an input data frame and a map of
+    function namesto functions that each are
+    to act row-wise on the input dataframe.
     Return a DataFrame whose columns are
     the result of those functions on the
     input dataframe.
@@ -113,14 +111,6 @@ def get_numeric_features(df):
     float_feature_names = [feature for feature in df.columns
                            if df[feature].dtype in NUMERIC_TYPES]
     return df[float_feature_names]
-
-
-def arff_to_df(arff):
-    rows = []
-    for row in arff[0]:
-        rows.append(list(row))
-    attributes = [x for x in arff[1]]
-    return pd.DataFrame(rows, columns=attributes)
 
 
 def get_nominal_integer_dict(nominal_vals):
@@ -164,7 +154,7 @@ def convert_strings_to_integer(df):
 def get_index_rows(srs, indices):
     """
     Given a dataframe and a list of indices,
-    return a list of row indices corresponding
+    return a list of row numbers corresponding
     to the supplied indices (maintaining order)
     """
     rows = []
@@ -181,7 +171,6 @@ def group_by_binning(df, column, bins):
     """
 
     def grouper(x):
-
         for i in range(len(bins[:-1])):
             left, right = bins[i], bins[i+1]
             if x >= left and x < right:

@@ -9,6 +9,8 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 from sklearn.metrics import f1_score, fbeta_score
 
+from sklearn.ensemble import RandomForestClassifier
+
 from sklearn.externals.six import StringIO
 import pydot
 from sklearn import tree
@@ -18,6 +20,8 @@ from sklearn.metrics import roc_curve, auc
 
 from random import sample
 from plotting import hist
+
+from data import NUMERIC_TYPES
 
 import matplotlib.pyplot as plt
 
@@ -162,8 +166,11 @@ def print_tree(clf, file_name, **kwargs):
     graph.write_pdf(file_name)
 
 
-# Return a dataframe where half of the features are scored
+
 def get_scores_cv(classifier_class, features, labels, fit_params=None):
+    """
+    Return a dataframe where half of the features are scored
+    """
     training_features = features[::2]
     training_labels = labels[::2]
 
@@ -177,20 +184,32 @@ def get_scores_cv(classifier_class, features, labels, fit_params=None):
     return grp
 
 
-def get_floating_point_features(df, remove_na=True):
-    # Get floating point features
+def get_floating_feature_names(df):
+
     float_feature_names = []
 
     for feature in df.columns:
-        if df[feature].dtype == 'float64':
+        if df[feature].dtype in NUMERIC_TYPES:
             float_feature_names.append(feature)
 
+    return float_feature_names
+
+
+def get_floating_point_features(df, remove_na=True):
+
+    float_feature_names = get_Floating_feature_names(df)
     float_features = df[float_feature_names]
 
     if remove_na:
         float_features = float_features.fillna(float_features.mean()).dropna(axis=1)
 
     return float_features
+
+
+def check_nulls(df):
+    nans = pandas.isnull(features).sum()
+    nans.sort()
+    return nans
 
 
 def arff_to_df(arff):

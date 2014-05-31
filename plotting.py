@@ -13,8 +13,27 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 from data import group_by_binning, NUMERIC_TYPES
 
-class SkipPlot(Exception):
-    pass
+
+def hexbin(df, x, y, **kwargs):
+    plt.hexbin(data[x].values, data[y].values)
+    plt.xlabel(x)
+    plt.ylabel(y)
+    plt.colorbar()
+
+
+def boxplot(df, x, y, bins=None):
+    """ Draw a boxplot using the
+    variables x and y.
+    Include ticks
+    If 'bins' is not none, group the x-axis
+    variable into the supplied bins
+    """
+
+    from pandas.tools.plotting import boxplot_frame_groupby
+    if bins is None:
+        boxplot_frame_groupby(df.groupby(x)[y], subplots=False)
+    else:
+        boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False)
 
 
 def hist(grouped, var=None, *args, **kwargs):
@@ -65,7 +84,7 @@ def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False,
     plt.legend(loc='best', fancybox=True)
 
 
-def _series_hist_float(grouped, ax, autobin=False, normed=False, normalize=False,
+def _series_hist_float(grouped, ax=plt.gca(), autobin=False, normed=False, normalize=False,
                        stacked=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
@@ -110,7 +129,8 @@ def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        srs.value_counts(normalize=normalize).plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
+        value_counts = srs.value_counts(normalize=normalize).sort_index()
+        value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
 
 
 def scatter(grouped, x, y, **kwargs):
@@ -128,34 +148,91 @@ def scatter(grouped, x, y, **kwargs):
     plt.ylabel(y)
 
 
-def binner(divisor):
+def stacked_counts_plot(grouped, category, ratio=False, **kwargs):
     """
-    Returns a function that rounds a number
-    down to the nearst factor of the divisor
+    Takes a dataframe that has been grouped and
+    plot a stacked bar-plot representing the makeup of
+    the input category per group.
+    Optionally, show the ratio of the category in each group.
+
+    Convert this:
+    category  group
+    A         1
+    A         1
+    A         2
+    B         1
+    B         2
+
+    Into this:
+    1: A A B
+    2: A B
+    as a barplot
     """
-    def round_down(num):
-        return num - (num % divisor)
-    return round_down
+
+    counts = grouped[category].value_counts().unstack().fillna(0.)
+
+    if ratio:
+        denom = counts.sum(axis=1)
+        counts = counts.divide(denom, axis='index')
+
+    ax = plt.gca()
+    plot = counts.plot(kind="bar", stacked=True, subplots=False, ax=ax, **kwargs)
+    for container in plot.containers:
+        plt.setp(container, width=1)
 
 
-def binned_ratio(seriesA, seriesB, bin_width):
-    numer = seriesA.map(binner(bin_width)).value_counts()
-    denom = seriesB.map(binner(bin_width)).value_counts()
-    return numer / denom
+def _draw_stacked_plot(grouped, **kwargs):
+    """
+    Draw a vertical bar plot of multiple series
+    stacked on top of each other
+
+    Deals with some annoying pandas issues when
+    drawing a DataFrame
+    """
+
+    #color_cycle = ax._get_lines.color_cycle
+
+    series_dict = {}
+
+    for (key, srs) in grouped:
+        series_dict[key] = srs
+
+    df_for_plotting = pd.DataFrame(series_dict)
+    df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
 
 
-def vals_in_range(vals, bins):
-    return len([val for val in vals
-                if val >= bins[0]
-                and val <= bins[-1]])
+def _save_plots(grouped, plot_func, output_file, title=None, *args, **kwargs):
+    """
+    Take a grouped dataframe and save a pdf of
+    the histogrammed variables in that dataframe.
+    TODO: Can we abstract this behavior...?
+    """
+
+    pdf = PdfPages(output_file)
+
+    if title:
+        helpers.title_page(pdf, title)
+
+    subplots = PdfSubplots(pdf, 3, 3)
+
+    for (var, series) in grouped._iterate_column_groupbys():
+
+        subplots.next_subplot()
+        try:
+            plot_func(series, *args, **kwargs)
+            #_series_hist(series, *args, **kwargs)
+            plt.xlabel(var)
+            subplots.end_iteration()
+        except :
+            subplots.skip_subplot()
+
+    subplots.finalize()
+
+    pdf.close()
 
 
-def add_label(labels):
-    xy = (0.55, 0.95)
-    for name, val in labels.iteritems():
-        plt.annotate("{0}: {1}".format(name, val),
-                     xy=xy, xycoords='axes fraction')
-        xy = (xy[0], xy[1]-0.04)
+def save_grouped_hists(grouped, output_file, title=None, *args, **kwargs):
+    _save_plots(grouped, _series_hist, output_file, title, *args, **kwargs)
 
 
 def get_variable_binning(var, nbins=10, int_bound=40):
@@ -201,107 +278,3 @@ def get_variable_binning(var, nbins=10, int_bound=40):
 
     bins = np.arange(nbins+1)/nbins * (var_max - var_min) + var_min
     return bins
-
-
-def boxplot(df, xaxis, yaxis, bins=None):
-    """ Draw a boxplot using the
-    variables xaxis and yaxis.
-    Include ticks
-    If 'bins' is not none, group the x-axis
-    variable into the supplied bins
-    """
-
-    if xaxis not in df:
-        print "x axis " + xaxis + " not in DataFrame: ", df
-        print df.columns
-        raise Exception()
-
-    if yaxis not in df:
-        print "y axis " + yaxis + " not in DataFrame: ", df
-        print df.columns
-        raise Exception()
-
-    from pandas.tools.plotting import boxplot_frame_groupby
-    if bins is None:
-        boxplot_frame_groupby(df.groupby(xaxis)[yaxis], subplots=False)
-    else:
-        boxplot_frame_groupby(group_by_binning(df, xaxis, bins)[yaxis], subplots=False)
-
-
-def stacked_counts_plot(df, xaxis, categories, ratio=False, **kwargs):
-    """
-    Draw a plot of the counts per category in categories
-    per bin of x-axis.
-
-    Convert this:
-    class  day
-    A      1
-    A      1
-    A      2
-    B      1
-    B      2
-
-    Into this:
-    A A B
-    A B
-    as a barplot
-    """
-
-    counts = df.groupby(xaxis)[categories].value_counts().unstack().fillna(0.)
-
-    if ratio:
-        denom = counts.sum(axis=1)
-        counts = counts.divide(denom, axis='index')
-
-    ax = plt.gca()
-    plot = counts.plot(kind="bar", stacked=True, subplots=False, ax=ax, **kwargs)
-    for container in plot.containers:
-        plt.setp(container, width=1)
-
-
-def _draw_stacked_plot(grouped, **kwargs):
-    """
-    Draw a vertical bar plot of multiple series
-    stacked on top of each other
-
-    Deals with some annoying pandas issues when
-    drawing a DataFrame
-    """
-
-    #color_cycle = ax._get_lines.color_cycle
-
-    series_dict = {}
-
-    for (key, srs) in grouped:
-        series_dict[key] = srs
-
-    df_for_plotting = pd.DataFrame(series_dict)
-    df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
-
-def save_grouped_hists(grouped, output_file, title=None, *args, **kwargs):
-    """
-    Take a grouped dataframe and save a pdf of
-    the histogrammed variables in that dataframe.
-    TODO: Can we abstract this behavior...?
-    """
-
-    pdf = PdfPages(output_file)
-
-    if title:
-        helpers.title_page(pdf, title)
-
-    subplots = PdfSubplots(pdf, 3, 3)
-
-    for (var, series) in grouped._iterate_column_groupbys():
-
-        subplots.next_subplot()
-        try:
-            _series_hist(series, *args, **kwargs)
-            plt.xlabel(var)
-            subplots.end_iteration()
-        except :
-            subplots.skip_subplot()
-
-    subplots.finalize()
-
-    pdf.close()
