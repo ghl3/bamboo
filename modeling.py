@@ -25,32 +25,7 @@ from data import NUMERIC_TYPES
 
 import matplotlib.pyplot as plt
 
-
-def get_prediction(classifier, testing_features, testing_targets=None, retain_columns=None):
-    """
-    A better version of get_scores
-    Takes a classifier and a
-    """
-    predictions = classifier.predict(testing_features)
-
-    df_dict = {'predict':predictions}
-    if testing_targets is not None:
-        df_dict[testing_targets.name] = testing_targets
-
-    scores = classifier.predict_proba(testing_features).T
-    for idx, scores in enumerate(scores):
-        df_dict['predict_proba_%s' % idx] = scores
-
-    prediction = pd.DataFrame(df_dict)
-    prediction = prediction.set_index(testing_features.index)
-
-    if retain_columns is not None:
-        prediction = prediction.join(testing_features[retain_columns])
-
-    return prediction
-
-
-def print_roc_curve(y_true, y_scores):
+def plot_roc_curve(y_true, y_scores):
 
     fpr, tpr, thresholds = roc_curve(y_true, y_scores)
     roc_auc = auc(fpr, tpr)
@@ -66,7 +41,7 @@ def print_roc_curve(y_true, y_scores):
     plt.legend(loc="lower right")
 
 
-def print_precision_recall_curve(y_true, y_scores):
+def plot_precision_recall_curve(y_true, y_scores):
 
     precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
     pr_auc = auc(recall, precision)
@@ -82,56 +57,47 @@ def print_precision_recall_curve(y_true, y_scores):
     plt.legend(loc="lower left")
 
 
-def print_distribution(clf, features, targets, fit_params=None, **kwargs):
+def plot_distribution(clf, features, targets, fit_params=None, **kwargs):
     score_groups = get_scores(targets, features, clf,
                               StratifiedKFold(targets, n_folds=2), fit_params)
     hist(score_groups[0].groupby('targets'), var='score', **kwargs)
 
 
-def balance_dataset(df, var='state', shrink=False, random_seed=None):
-    grouped = df.groupby(var)
+def balance_dataset(grouped, shrink=False, random=False):
 
-    N0 = len(grouped.groups[0])
-    N1 = len(grouped.groups[1])
+    df = grouped.obj
+    return df.ix[balanced_group_indices(grouped, shrink=shrink, random=random)]
 
-    print 'Balance dataset:'
-    print '   Group 0: %d' % N0
-    print '   Group 1: %d' % N1
 
-    idx0 = grouped.groups[0]
-    idx1 = grouped.groups[1]
+def balanced_indices(grouped, shrink=False, random=False):
+
+    lengths = [len(group) for idx, group in grouped.groups.iteritems()]
 
     if shrink:
-        if N1 > N0:
-            print '   Shrinking group 1.'
-            idx1 = idx1[:N0]
-        else:
-            print '   Shrinking group 0.'
-            idx0 = idx0[:N1]
-
-        df = pd.concat([df.ix[idx0],df.ix[idx1]])
-        return df
-
-    if N1 > N0:
-        Ndraw = (N1-N0)
-        print '   Growing group 0.'
-        print '   Drawing %d random samples (with replacement).' % Ndraw
-        idx = grouped.groups[0]
+        size = min(lengths)
     else:
-        Ndraw = (N0-N1)
-        print '   Growing group 1.'
-        print '   Drawing %d random samples (with replacement).' % Ndraw
-        idx = grouped.groups[1]
+        size = max(lengths)
 
-    if random_seed is not None:
-        np.random.seed(random_seed)
-    ridx = np.random.choice(idx, size=Ndraw)
-    df = pd.concat([df,df.ix[ridx]])
+    indices = []
 
-    return df
+    for group_key, group_indices in grouped.groups.iteritems():
+        if random:
+            sub_indices = np.random.choice(group_indices, size=size)
+        else:
+            sub_indices = group_indices[:size]
+        indices.extend(sub_indices)
 
+    return indices
 
+'''
 def balanced_indices(srs):
+    """
+    Take a set of indices 
+    Return (row based) indices determining
+    a list of rows that compromise a balanced
+    dataset of the input series.
+    To be used as: srs.iloc[indices]
+    """
     values = set(srs.values)
 
     num = min(srs.value_counts())
@@ -142,15 +108,76 @@ def balanced_indices(srs):
         reduced = srs[srs==val]
         all_indices.extend(sample(reduced.index, num))
 
-    return all_indices
+    return get_index_rows(srs, all_indices)
+'''
+
+
+
+def get_prediction(classifier, features, targets=None, retain_columns=None):
+    """
+    Takes a trained classifier  as well as a set
+    of features to test on and the true classes for those features.
+    Returns a DataFrame containing the predicted class,
+    the predicted class probabilities, and the true
+    class (if available)
+    """
+    predictions = classifier.predict(features)
+
+    df_dict = {'predict':predictions}
+    if targets is not None:
+        df_dict[targets.name] = targets
+
+    scores = classifier.predict_proba(features).T
+    for idx, scores in enumerate(scores):
+        df_dict['predict_proba_%s' % idx] = scores
+
+    prediction = pd.DataFrame(df_dict)
+    prediction = prediction.set_index(features.index)
+
+    if retain_columns is not None:
+        prediction = prediction.join(features[retain_columns])
+
+    return prediction
+
+
+def get_scores(clf, targets, features, cv, balance=True, retain_columns=None):
+    """
+    Take an (untrained) classifier and a set of targets
+    and features.  Split the targets and features into
+    training and testing subsets using the input
+    cross validation.  The classifier is trained on the
+    training sets and is then scored on the testing set.
+    This is repeated for every cross-validation set.
+    A list of the results for each cross-validation set
+    is returned.
+    """
+
+    groups = []
+
+    for i, (train, test) in enumerate(cv):
+
+        training_targets = targets.iloc[train]
+        training_features = features.iloc[train]
+
+        if balance:
+            train_balanced = balanced_indices(training_targets.groupby(training_targets))
+            training_targets = training_targets.iloc[train_balanced]
+            training_features = training_features.iloc[train_balanced]
+
+        classifier = clf.fit(training_features, training_targets)
+
+        grp = get_prediction(classifier, testing_features, testing_targets, retain_columns)
+        groups.append(grp)
+
+    return groups
 
 
 def feature_selection_trees(features, labels):
     """
     Returns a list of the names of the best features (as strings)
     """
-    clf = ExtraTreesClassifier(n_estimators=100)
-    X_new = clf.fit(features, labels).transform(features)
+    clf = ExtraTreesClassifier(n_estimators=100).fit(features, labels)
+    #clf = clf.fit(features, labels)#.transform(features)
     importances = [x for x in zip(features.columns, clf.feature_importances_)]
     return sorted(importances, key=lambda x: x[1])
 
@@ -159,12 +186,11 @@ def get_best_features(features, labels, max_to_return=20):
     return [feature for (feature, importance) in feature_selection_trees(features, labels)[:max_to_return]]
 
 
-def print_tree(clf, file_name, **kwargs):
+def plot_tree(clf, file_name, **kwargs):
     dot_data = StringIO()
     tree.export_graphviz(clf, out_file=dot_data, **kwargs)
     graph = pydot.graph_from_dot_data(dot_data.getvalue())
     graph.write_pdf(file_name)
-
 
 
 def get_scores_cv(classifier_class, features, labels, fit_params=None):
@@ -258,57 +284,6 @@ def get_index_rows(srs, indices):
         if index in indices:
             rows.append(i)
     return rows
-
-
-def balanced_indices(srs):
-    """
-    Return (row based) indices determining
-    a list of rows that compromise a balanced
-    dataset of the input series.
-    To be used as: srs.iloc[indices]
-    """
-    values = set(srs.values)
-
-    num = min(srs.value_counts())
-
-    all_indices = []
-
-    for val in values:
-        reduced = srs[srs==val]
-        all_indices.extend(sample(reduced.index, num))
-
-    return get_index_rows(srs, all_indices)
-
-
-def get_scores(targets, features, clf, cv, balance=True):
-    """
-    Return a list of DataFrames consisting
-    of target values and scores
-    """
-
-    groups = []
-
-    for i, (train, test) in enumerate(cv):
-
-        training_targets = targets.iloc[train]
-        training_features = features.iloc[train]
-
-        if balance:
-            train_balanced = balanced_indices(training_targets)
-            training_targets = training_targets.iloc[train_balanced]
-            training_features = training_features.iloc[train_balanced]
-
-        classifier = clf.fit(training_features, training_targets)
-
-        testing_features = features.iloc[test]
-        scores = [x[1] for x in classifier.predict_proba(testing_features)]
-
-        grp = pd.DataFrame({'targets' : targets.iloc[test],
-                            'score' : scores})
-        grp['targets'] = grp['targets'].map(str)
-        groups.append(grp)
-
-    return groups
 
 
 def feature_importances(importances, features):
