@@ -1,3 +1,4 @@
+
 import numpy as np
 
 import pandas as pd
@@ -24,6 +25,7 @@ from plotting import hist
 from data import NUMERIC_TYPES
 
 import matplotlib.pyplot as plt
+
 
 def plot_roc_curve(y_true, y_scores):
 
@@ -58,15 +60,15 @@ def plot_precision_recall_curve(y_true, y_scores):
 
 
 def plot_distribution(clf, features, targets, fit_params=None, **kwargs):
-    score_groups = get_scores(targets, features, clf,
+    score_groups = get_scores(clf, features, targets,
                               StratifiedKFold(targets, n_folds=2), fit_params)
-    hist(score_groups[0].groupby('targets'), var='score', **kwargs)
+    hist(score_groups[0].groupby('targets'), var='predict_proba_1', **kwargs)
 
 
-def balance_dataset(grouped, shrink=False, random=False):
+def balance_dataset(grouped, shrink=True, random=False):
 
     df = grouped.obj
-    return df.ix[balanced_group_indices(grouped, shrink=shrink, random=random)]
+    return df.ix[balanced_indices(grouped, shrink=shrink, random=random)]
 
 
 def balanced_indices(grouped, shrink=False, random=False):
@@ -126,6 +128,7 @@ def get_prediction(classifier, features, targets=None, retain_columns=None):
     df_dict = {'predict':predictions}
     if targets is not None:
         df_dict[targets.name] = targets
+        df_dict['targets'] = targets
 
     scores = classifier.predict_proba(features).T
     for idx, scores in enumerate(scores):
@@ -140,7 +143,7 @@ def get_prediction(classifier, features, targets=None, retain_columns=None):
     return prediction
 
 
-def get_scores(clf, targets, features, cv, balance=True, retain_columns=None):
+def get_scores(clf, features, targets, cv, balance=True, retain_columns=None):
     """
     Take an (untrained) classifier and a set of targets
     and features.  Split the targets and features into
@@ -160,11 +163,16 @@ def get_scores(clf, targets, features, cv, balance=True, retain_columns=None):
         training_features = features.iloc[train]
 
         if balance:
+            # Get the indices of a balanced dataset and use
+            # on the training features and targets
             train_balanced = balanced_indices(training_targets.groupby(training_targets))
-            training_targets = training_targets.iloc[train_balanced]
-            training_features = training_features.iloc[train_balanced]
+            training_targets = training_targets.ix[train_balanced]
+            training_features = training_features.ix[train_balanced]
 
         classifier = clf.fit(training_features, training_targets)
+
+        testing_targets = targets.iloc[test]
+        testing_features = features.iloc[test]
 
         grp = get_prediction(classifier, testing_features, testing_targets, retain_columns)
         groups.append(grp)

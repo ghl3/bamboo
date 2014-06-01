@@ -15,7 +15,7 @@ from data import group_by_binning, NUMERIC_TYPES
 
 
 def hexbin(df, x, y, **kwargs):
-    plt.hexbin(data[x].values, data[y].values)
+    plt.hexbin(df[x].values, df[y].values)
     plt.xlabel(x)
     plt.ylabel(y)
     plt.colorbar()

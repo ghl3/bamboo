@@ -1,7 +1,5 @@
 
-
 import pandas
-
 import bamboo.plotting
 
 group = ['A', 'A', 'A', 'A',
@@ -22,3 +20,12 @@ df = pandas.DataFrame({'group':group,
 
 def test_boxplot():
     bamboo.plotting.boxplot(df, 'feature1', 'feature2')
+
+def test_hexbin():
+    bamboo.plotting.hexbin(df, 'feature1', 'feature2')
+
+def test_hist_df():
+    bamboo.plotting.hist(df.groupby('group'))
+
+def test_hist_var():
+    bamboo.plotting.hist(df.groupby('group'), 'feature1')
