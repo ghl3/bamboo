@@ -28,11 +28,8 @@ import matplotlib.pyplot as plt
 
 
 def plot_roc_curve(y_true, y_scores):
-
     fpr, tpr, thresholds = roc_curve(y_true, y_scores)
     roc_auc = auc(fpr, tpr)
-
-    # Plot ROC curve
     plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.plot([0, 1], [0, 1], 'k--')
     plt.xlim([0.0, 1.0])
@@ -44,11 +41,8 @@ def plot_roc_curve(y_true, y_scores):
 
 
 def plot_precision_recall_curve(y_true, y_scores):
-
     precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
     pr_auc = auc(recall, precision)
-
-    # Plot ROC curve
     plt.plot(recall, precision, label='P-R curve (area = %0.2f)' % pr_auc)
     plt.plot([0, 1], [1, 0], 'k--')
     plt.xlim([0.0, 1.0])
@@ -66,7 +60,6 @@ def plot_distribution(clf, features, targets, fit_params=None, **kwargs):
 
 
 def balance_dataset(grouped, shrink=True, random=False):
-
     df = grouped.obj
     return df.ix[balanced_indices(grouped, shrink=shrink, random=random)]
 
@@ -90,29 +83,6 @@ def balanced_indices(grouped, shrink=False, random=False):
         indices.extend(sub_indices)
 
     return indices
-
-'''
-def balanced_indices(srs):
-    """
-    Take a set of indices 
-    Return (row based) indices determining
-    a list of rows that compromise a balanced
-    dataset of the input series.
-    To be used as: srs.iloc[indices]
-    """
-    values = set(srs.values)
-
-    num = min(srs.value_counts())
-
-    all_indices = []
-
-    for val in values:
-        reduced = srs[srs==val]
-        all_indices.extend(sample(reduced.index, num))
-
-    return get_index_rows(srs, all_indices)
-'''
-
 
 
 def get_prediction(classifier, features, targets=None, retain_columns=None):
@@ -194,28 +164,20 @@ def get_best_features(features, labels, max_to_return=20):
     return [feature for (feature, importance) in feature_selection_trees(features, labels)[:max_to_return]]
 
 
+def feature_importances(importances, features):
+    return pd.DataFrame(sorted(zip(features.columns, importances), key=lambda x: -x[1]),
+                        columns=['feature', 'value'])
+
+def get_importances(features, targets):
+    fit = RandomForestClassifier(n_estimators=100).fit(features, targets)
+    return feature_importances(fit.feature_importances_, features)
+
+
 def plot_tree(clf, file_name, **kwargs):
     dot_data = StringIO()
     tree.export_graphviz(clf, out_file=dot_data, **kwargs)
     graph = pydot.graph_from_dot_data(dot_data.getvalue())
     graph.write_pdf(file_name)
-
-
-def get_scores_cv(classifier_class, features, labels, fit_params=None):
-    """
-    Return a dataframe where half of the features are scored
-    """
-    training_features = features[::2]
-    training_labels = labels[::2]
-
-    testing_features = features[1::2]
-    testing_labels = labels[1::2]
-
-    classifier = classifier_class.fit(training_features, training_labels, fit_params)
-
-    grp = pd.DataFrame({'targets' : testing_labels.map(str),
-                        'score' : [x[1] for x in classifier.predict_proba(testing_features)]}).groupby('targets')
-    return grp
 
 
 def get_floating_feature_names(df):
@@ -238,22 +200,6 @@ def get_floating_point_features(df, remove_na=True):
         float_features = float_features.fillna(float_features.mean()).dropna(axis=1)
 
     return float_features
-
-
-def check_nulls(df):
-    nans = pandas.isnull(features).sum()
-    nans.sort()
-    return nans
-
-
-def arff_to_df(arff):
-    rows = []
-    for row in arff[0]:
-        rows.append(list(row))
-    attributes = [x for x in arff[1]]
-
-    # Create the DataFrame
-    return pd.DataFrame(rows, columns=attributes)
 
 
 def get_nominal_integer_dict(nominal_vals):
@@ -288,42 +234,7 @@ def get_index_rows(srs, indices):
     to the supplied indices (maintaining order)
     """
     rows = []
-    for i, (index, row) in enumerate(srs.iteritems()): #.iterrows()):
+    for i, (index, row) in enumerate(srs.iteritems()):
         if index in indices:
             rows.append(i)
     return rows
-
-
-def feature_importances(importances, features):
-    return pd.DataFrame(sorted(zip(features.columns, importances), key=lambda x: -x[1]),
-                        columns=['feature', 'value'])
-
-def get_importances(features, targets):
-    fit = RandomForestClassifier(n_estimators=100).fit(features, targets)
-    return feature_importances(fit.feature_importances_, features)
-
-
-class ScoreFeature():
-    """
-    A score created by a classifier using a
-    specific set of features.
-    Handles grabbing that set of features
-    from a pandas dataset and
-    scoring on those features.
-
-    See examples in:
-    /Users/george/Work/risk/IdFeatures.arff
-    """
-
-    def __init__(self, clf, names):
-        self.clf = clf
-        self.names = names
-        self.fitted = None
-
-    def get_features(self, df):
-        return df[self.names]
-
-    def score(self, features, class_index=1):
-        scores = self.clf.predict_proba(self.get_features(features))
-        class_scores = [score[class_index] for score in scores]
-        return pd.Series(class_scores)

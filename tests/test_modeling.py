@@ -21,12 +21,11 @@ df = pandas.DataFrame({'group':group,
                        'feature1':feature1,
                        'feature2':feature2})
 
-
-
 features = df[['feature1', 'feature2']]
 targets = df['group']
 classifier = sklearn.ensemble.RandomForestClassifier()
 fitted = classifier.fit(features, targets)
+
 
 def test_balance_dataset():
     bamboo.modeling.balance_dataset(df.groupby('group'))
