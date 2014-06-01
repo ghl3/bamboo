@@ -238,3 +238,19 @@ def get_index_rows(srs, indices):
         if index in indices:
             rows.append(i)
     return rows
+
+
+def score_summary(classifier, features, targets, scoring, **kwargs):
+    """
+    Run cross-validation using the input (untrained) classifier
+    with the input features and targets.
+    Apply the requested cross-validation techniques
+    and print a summary
+    """
+
+    for cv in scoring:
+        scores = cross_validation.cross_val_score(classifier, features, targets, scoring=cv, **kwargs)
+        print '----- %s -----' % cv
+        print scores
+        print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+        print '\n'

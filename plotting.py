@@ -1,5 +1,7 @@
 from __future__ import division
 
+import math
+
 import pandas as pd
 from pandas import DataFrame
 
@@ -11,7 +13,9 @@ import numpy as np
 from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
 
-from data import group_by_binning, NUMERIC_TYPES
+from data import group_by_binning
+from functions import groupmap
+from data import NUMERIC_TYPES
 
 
 def hexbin(df, x, y, **kwargs):
@@ -131,6 +135,25 @@ def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
 
         value_counts = srs.value_counts(normalize=normalize).sort_index()
         value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
+
+
+def hist_functions(grouped, functions, cols=2, **kwargs):
+    """
+    Take a DataFrameGroupBy and a list of functions and make a
+    grid of plots showing a histogram of the values of each
+    function applied to each group individually.
+    Each function should take a row in the dataframe and
+    can reference columns using dict-like access on that row.
+    Useful for exploring new features in classification
+    """
+
+    rows = math.ceil(len(functions) / cols)
+
+    for i, function in enumerate(functions):
+
+        plt.subplot(rows, cols, i+1)
+        hist(groupmap(grouped, function), **kwargs)
+
 
 
 def scatter(grouped, x, y, **kwargs):

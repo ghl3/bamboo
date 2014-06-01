@@ -178,3 +178,19 @@ def group_by_binning(df, column, bins):
         return None
 
     return df.groupby(df[column].map(grouper))
+
+
+def get_columns_with_null(df):
+    null_counts = pandas.isnull(df).sum()
+    return null_counts[null_counts > 0]
+
+
+def get_rows_with_null(df):
+    """
+    Return a DataFrame of all rows that
+    contain a null value in ANY column
+    """
+    null_row_counts = pandas.isnull(training_all_features).sum(axis=1)
+    return df[null_row_counts > 0]
+
+
