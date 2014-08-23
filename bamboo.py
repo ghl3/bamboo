@@ -1,12 +1,13 @@
 
 
+import pandas as pd
+from pandas.core.groupby import GroupBy
+
+
 """
 Miscellaneous functions acting on various objects
 """
 
-
-import pandas as pd
-from pandas.core.GroupBy import GroupBy
 
 def head(frame, n=5):
     """

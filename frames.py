@@ -64,10 +64,19 @@ def take(df, var, exclude=None):
     return (df[var], df[rest])
 
 
-def apply_all(df, *args):
+def apply_all(df, *args, **kwargs):
+    """
+    Return a new dataframe consisting of
+    a number of functions applied to the
+    current dataframe
+    """
+
+    if 'axis' not in kwargs:
+        kwargs['axis']=1
+
     res = {}
     for arg in args:
-        res[arg.__name__] = df.apply(arg, axis=1)
+        res[arg.__name__] = df.apply(arg, **kwargs)
     return pd.DataFrame(res)
 
 

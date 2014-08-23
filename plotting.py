@@ -35,9 +35,9 @@ def boxplot(df, x, y, bins=None):
 
     from pandas.tools.plotting import boxplot_frame_groupby
     if bins is None:
-        boxplot_frame_groupby(df.groupby(x)[y], subplots=False)
+        boxplot_frame_groupby(df.groupby(x)[y], subplots=False, return_type='dict')
     else:
-        boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False)
+        boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False, return_type='dict')
 
 
 def hist(grouped, var=None, *args, **kwargs):
