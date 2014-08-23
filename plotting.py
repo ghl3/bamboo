@@ -150,10 +150,9 @@ def hist_functions(grouped, functions, cols=2, **kwargs):
     rows = math.ceil(len(functions) / cols)
 
     for i, function in enumerate(functions):
-
         plt.subplot(rows, cols, i+1)
         hist(groupmap(grouped, function), **kwargs)
-
+        plt.xlabel(function.__name__)
 
 
 def scatter(grouped, x, y, **kwargs):

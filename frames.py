@@ -2,11 +2,12 @@ from __future__ import division
 
 import pandas as pd
 
+from bamboo import NUMERIC_TYPES
 
-NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
-                 'int16', 'int32', 'int64', 'uint8',
-                 'uint16', 'uint32', 'uint64', 'float_',
-                 'float16', 'float32', 'float64')
+"""
+Functions that act on data frames
+"""
+
 
 
 def exclude(df, exclude):
@@ -67,7 +68,7 @@ def apply_all(df, *args):
     res = {}
     for arg in args:
         res[arg.__name__] = df.apply(arg, axis=1)
-    return pandas.DataFrame(res)
+    return pd.DataFrame(res)
 
 
 def map_functions(df, functions):
@@ -181,7 +182,7 @@ def group_by_binning(df, column, bins):
 
 
 def get_columns_with_null(df):
-    null_counts = pandas.isnull(df).sum()
+    null_counts = pd.isnull(df).sum()
     return null_counts[null_counts > 0]
 
 
@@ -190,7 +191,23 @@ def get_rows_with_null(df):
     Return a DataFrame of all rows that
     contain a null value in ANY column
     """
-    null_row_counts = pandas.isnull(training_all_features).sum(axis=1)
+    null_row_counts = pd.isnull(df).sum(axis=1)
     return df[null_row_counts > 0]
+
+
+
+def combine_data_frames(frames):
+    """
+    Helper function to combine multiple data frames
+    into a single data frame
+    """
+
+    if len(frames)==0:
+        return pd.DataFrame()
+    elif len(frames)==1:
+        return frames[0]
+    else:
+        first = frames[0]
+        return first.append(list(frames[1:]))
 
 
