@@ -3,11 +3,12 @@ import pandas
 
 from pandas.util.testing import assert_frame_equal, assert_panelnd_equal
 
+from bamboo.bamboo import head
 
 def assert_equals(obj1, obj2):
 
     print "Object of type {}:\n {}\nShould equal Object of type {}:\n{}\n".format(
-        type(obj1), obj1, type(obj2), obj2)
+        type(obj1), head(obj1), type(obj2), head(obj2))
 
     assert(type(obj1)==type(obj2))
 
@@ -24,6 +25,7 @@ def assert_groupby_equal(groupby, test, **kwargs):
         assert(keyA==keyB)
         assert_frame_equal(groupA, groupB, **kwargs)
 
+
 def create_test_df():
     group = [0, 0, 0, 0,
              1, 1,
@@ -36,6 +38,32 @@ def create_test_df():
     feature2 = [10.0, 10.5, 9.5, 11.0,
                 20.0, 20.0,
                 0.0, 200.0]
+
+    df = pandas.DataFrame({'group':group,
+                           'feature1':feature1,
+                           'feature2':feature2})
+
+    return df
+
+
+def create_test_df_v2():
+    group = [0, 0, 0, 0,
+             1, 1,
+             0, 1,
+             3, 3,
+             4, 4]
+
+    feature1 = [1, 1, 1, 1,
+                2, 2,
+                3, 4,
+                10, 10,
+                12, 18]
+
+    feature2 = [10.0, 10.5, 9.5, 11.0,
+                20.0, 20.0,
+                0.0, 200.0,
+                -10.0, -5.0,
+                10.0, 20.0]
 
     df = pandas.DataFrame({'group':group,
                            'feature1':feature1,

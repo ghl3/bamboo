@@ -29,17 +29,26 @@ def filter_groups(dfgb, filter_function):
     return combine_data_frames(return_groups).groupby(dfgb.keys)
 
 
-def sort(grouped, key):
+def sorted_groups(dfgb, key):
+    """
+    Return a sorted version of the
+    grouped dataframe.  The required
+    key function is a function of each
+    group and determins the sort order
+    """
 
     sort_list = []
 
-    for name, group in grouped:
-        key_val = key(group)
-        sort_list.append((key_val, (name, group)))
+    for name, group in dfgb:
 
-    df = pandas.DataFrame
+        sort_val = key(group)
+        print name, sort_val
+        sort_list.append((sort_val, group))
 
-    return sorted(sort_list, key=lambda x: x[1])
+    sorted_groups = [group for val, group
+                     in sorted(sort_list, key=lambda x: x[0])]
+
+    return combine_data_frames(sorted_groups).groupby(dfgb.keys, sort=False)
 
 
 def groupmap(grouped, func):
@@ -48,7 +57,7 @@ def groupmap(grouped, func):
     to the DataFrames, returning a seriesgroupby
     of the values
     """
-    # grouped.index.name
+
     transformed = grouped.obj.apply(func, axis=1)
     return transformed.groupby(grouped.grouper)
 
@@ -61,8 +70,11 @@ def take_groups(dfgb, n):
 
     return_groups = []
 
-    for i in range(0, min(dfgb.ngroups, n)):
-        return_groups.append(dfgb.get_group(i))
+    for i, (key, group) in enumerate(dfgb):
+    #for i in range(0, min(dfgb.ngroups, n)):
+        if i >= n:
+            break
+        return_groups.append(group) #dfgb.get_group(i))
 
     return combine_data_frames(return_groups).groupby(dfgb.keys)
 

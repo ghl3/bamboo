@@ -43,11 +43,32 @@ def test_take_groups():
     assert_equals(filtered, should_be)
 
 
-def test_sort():
+# def test_sort():
+#     """
+#     Sort the order of the groups
+#     by the size of the group
+#     """
+#     dfgb = create_test_df().groupby('group')
+
+#     sorted_groups(dfgb, lambda x: len(x))
+
+
+def test_sort_v2():
     """
     Sort the order of the groups
     by the size of the group
     """
-    dfgb = create_test_df().groupby('group')
+    dfgb = create_test_df_v2().groupby('group')
 
-    sort(dfgb, lambda x: len(x))
+    dfgb_sorted = sorted_groups(dfgb, lambda x: x['feature2'].mean())
+
+    should_be = pandas.DataFrame({
+        'group': [3, 3, 0, 0, 0, 0, 0, 4, 4, 1, 1, 1],
+        'feature1' : [10, 10, 1, 1, 1, 1, 3, 12, 18, 2, 2, 4],
+        'feature2' : [-10.0, -5.0,10.0, 10.5, 9.5, 11.0, 0.0,10.0, 20.0, 20.0, 20.0, 200]},
+                                 index=[8, 9, 0, 1, 2, 3, 6, 10, 11,4, 5, 7]).groupby('group', sort=False)
+
+    assert_equals(dfgb_sorted, should_be)
+
+    group_order = [key for key, group in dfgb_sorted]
+    eq_(group_order, [3, 0, 4, 1])
