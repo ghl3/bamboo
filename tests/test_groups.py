@@ -25,6 +25,24 @@ def test_filter_groups():
     assert_equals(filtered, should_be)
 
 
+def test_take_groups():
+    """
+    Return only groups with size > 3
+    """
+
+    dfgb = create_test_df().groupby('group')
+
+    filtered = take_groups(dfgb, 1)
+
+    should_be = pandas.DataFrame({
+        'group': [0, 0, 0, 0, 0],
+        'feature1' : [1, 1, 1, 1, 3],
+        'feature2' : [10.0, 10.5, 9.5, 11.0, 0.0]},
+                                 index=[0, 1, 2, 3, 6]).groupby('group')
+
+    assert_equals(filtered, should_be)
+
+
 def test_sort():
     """
     Sort the order of the groups

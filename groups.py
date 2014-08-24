@@ -25,7 +25,6 @@ def filter_groups(dfgb, filter_function):
 
     for i in range(0, dfgb.ngroups):
         group = dfgb.get_group(i)
-        print group.index
         if filter_function(group):
             return_groups.append(group)
 
@@ -54,3 +53,19 @@ def groupmap(grouped, func):
     # grouped.index.name
     transformed = grouped.obj.apply(func, axis=1)
     return transformed.groupby(grouped.grouper)
+
+
+def take_groups(dfgb, n):
+    """
+    Return a DataFrameGroupBy holding the
+    up to the first n groups
+    """
+
+    return_groups = []
+
+    for i in range(0, min(dfgb.ngroups, n)):
+        return_groups.append(dfgb.get_group(i))
+
+    return combine_data_frames(return_groups).groupby(dfgb.keys)
+
+

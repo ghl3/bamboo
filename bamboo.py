@@ -9,7 +9,7 @@ Miscellaneous functions acting on various objects
 """
 
 
-def head(frame, n=5):
+def head(frame, n=5, ngroups=5):
     """
     A more powerful version of pandas 'head'
     that works nicely with DataFrameGroupBy objects
