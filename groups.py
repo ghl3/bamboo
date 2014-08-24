@@ -9,7 +9,7 @@ Functions that act on data frame group by objects
 
 """
 
-def filter_groups(dfgb, filter_function):
+def filter_groups(dfgb, filter_function, on_index=False):
     """
     Filter the groups of a DataFrameGroupBy
     and return a DataFrameGroupBy containing
@@ -17,13 +17,17 @@ def filter_groups(dfgb, filter_function):
     In pseudocode:
     return [group for group in dfgb.groups
             if filter_function(group)]
+    If on_index is true, the filter function is applied
+    to the group value (the index)
     """
 
     return_groups = []
 
-    for i in range(0, dfgb.ngroups):
-        group = dfgb.get_group(i)
-        if filter_function(group):
+    for val, group in dfgb: #range(0, dfgb.ngroups):
+        #group = dfgb.get_group(i)
+        if on_index and filter_function(val):
+            return_groups.append(group)
+        if not on_index and filter_function(group):
             return_groups.append(group)
 
     return combine_data_frames(return_groups).groupby(dfgb.keys)
