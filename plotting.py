@@ -13,9 +13,9 @@ import numpy as np
 from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
 
-from data import group_by_binning
-from functions import groupmap
-from data import NUMERIC_TYPES
+from frames import group_by_binning
+from groups import groupmap
+from helpers import NUMERIC_TYPES
 
 
 def hexbin(df, x, y, **kwargs):
@@ -64,7 +64,6 @@ def hist(grouped, var=None, *args, **kwargs):
                     print e
                 finally:
                     pass
-
     else:
         pass
 
@@ -242,7 +241,6 @@ def _save_plots(grouped, plot_func, output_file, title=None, *args, **kwargs):
         subplots.next_subplot()
         try:
             plot_func(series, *args, **kwargs)
-            #_series_hist(series, *args, **kwargs)
             plt.xlabel(var)
             subplots.end_iteration()
         except :
