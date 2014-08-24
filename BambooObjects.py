@@ -1,15 +1,15 @@
 
 import pandas as pd
+import pandas
 from pandas.core.groupby import GroupBy
 
 from inspect import getmembers, isfunction
 
-import bamboo.bamboo
 import bamboo, groups, frames
 
-_bamboo_methods = {name:func  for name, func in getmembers(bamboo.bamboo) if isfunction(func)}
-_frames_methods = {name:func  for name, func in getmembers(bamboo.frames) if isfunction(func)}
-_groups_methods = {name:func  for name, func in getmembers(bamboo.groups) if isfunction(func)}
+_bamboo_methods = {name:func  for name, func in getmembers(bamboo) if isfunction(func)}
+_frames_methods = {name:func  for name, func in getmembers(frames) if isfunction(func)}
+_groups_methods = {name:func  for name, func in getmembers(groups) if isfunction(func)}
 
 
 def _create_bamboo_wrapper(obj, func):
@@ -95,18 +95,16 @@ class BambooGroupBy(pandas.core.groupby.GroupBy):
                                              other.squeeze)
 
     def head(self, *args, **kwargs):
-        return bamboo.bamboo.head(self, *args, **kwargs)
+        return bamboo.head(self, *args, **kwargs)
 
     def __getattr__(self, *args, **kwargs):
 
         name, pargs = args[0], args[1:]
 
         if name in _bamboo_methods:
-            print "Using bamboo"
             return _create_bamboo_wrapper(self, _bamboo_methods[name])
 
         if name in _groups_methods:
-            print "Using groups"
             return _create_bamboo_wrapper(self, _groups_methods[name])
 
         return super(BambooGroupBy, self).__getattribute__(*args, **kwargs)
