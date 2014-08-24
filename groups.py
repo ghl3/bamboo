@@ -25,6 +25,7 @@ def filter_groups(dfgb, filter_function):
 
     for i in range(0, dfgb.ngroups):
         group = dfgb.get_group(i)
+        print group.index
         if filter_function(group):
             return_groups.append(group)
 
