@@ -8,8 +8,6 @@ from helpers import NUMERIC_TYPES
 Functions that act on data frames
 """
 
-
-
 def exclude(df, exclude):
     """
     Return a DataFrame with a set of feature excluded
@@ -202,21 +200,3 @@ def get_rows_with_null(df):
     """
     null_row_counts = pd.isnull(df).sum(axis=1)
     return df[null_row_counts > 0]
-
-
-
-def combine_data_frames(frames):
-    """
-    Helper function to combine multiple data frames
-    into a single data frame
-    """
-
-    if len(frames)==0:
-        return pd.DataFrame()
-    elif len(frames)==1:
-        return frames[0]
-    else:
-        first = frames[0]
-        return first.append(list(frames[1:]))
-
-

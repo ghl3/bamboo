@@ -71,10 +71,9 @@ def take_groups(dfgb, n):
     return_groups = []
 
     for i, (key, group) in enumerate(dfgb):
-    #for i in range(0, min(dfgb.ngroups, n)):
         if i >= n:
             break
-        return_groups.append(group) #dfgb.get_group(i))
+        return_groups.append(group)
 
     return combine_data_frames(return_groups).groupby(dfgb.keys)
 
