@@ -19,8 +19,8 @@ def exclude(df, exclude):
 
 def partition(df, partition_function):
     """
-    Separate a dataframe row-wise based on the
-    value of the supplied partition function
+    Group a DataFrame based on the value of a function
+    evaluated over the rows of the dataframe.
     """
 
     partition_values = df.apply(partition_function, axis=1)

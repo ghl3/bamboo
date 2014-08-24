@@ -36,3 +36,12 @@ def threading(df, *args):
     else:
         return df
 
+
+
+class Bamboo(Object):
+
+    def __init__(self, obj):
+        self.obj = obj
+
+    
+
