@@ -3,6 +3,8 @@
 import pandas as pd
 from pandas.core.groupby import GroupBy
 
+from groups import take_groups
+
 
 """
 Miscellaneous functions acting on various objects
@@ -16,7 +18,7 @@ def head(frame, n=5, ngroups=5):
     """
 
     if isinstance(frame, GroupBy):
-        return gropuped.apply(lambda x: x.head(n))
+        return take_groups(frame, ngroups).apply(lambda x: x.head(n))
     else:
         return frame.head(n)
 
@@ -33,25 +35,4 @@ def threading(df, *args):
         return threading(first_func(df), *args[1:])
     else:
         return df
-
-
-def combine_data_frames(frames):
-    """
-    A helper function to combine multiple
-    compatable data frames into a single
-    data frame (creating a fresh copy, of course)
-    """
-    if len(frames)==0:
-        return pd.DataFrame()
-    elif len(frames)==1:
-        return frames[0]
-    else:
-        first = frames[0]
-        return first.append(list(frames[1:]))
-
-
-NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
-                 'int16', 'int32', 'int64', 'uint8',
-                 'uint16', 'uint32', 'uint64', 'float_',
-                 'float16', 'float32', 'float64')
 

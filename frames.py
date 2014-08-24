@@ -2,7 +2,7 @@ from __future__ import division
 
 import pandas as pd
 
-from bamboo import NUMERIC_TYPES
+from helpers import NUMERIC_TYPES
 
 """
 Functions that act on data frames

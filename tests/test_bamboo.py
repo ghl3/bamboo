@@ -2,6 +2,7 @@
 import pandas
 from nose.tools import *
 from bamboo.bamboo import *
+from bamboo.helpers import *
 
 from pandas.util.testing import assert_frame_equal
 
@@ -43,3 +44,6 @@ def test_combine_data_frames():
 
     assert_frame_equal(combined, should_be)
 
+
+def test_head_groups():
+    head(dfgb, n=5, ngroups=5)
