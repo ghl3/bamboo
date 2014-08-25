@@ -56,9 +56,9 @@ Fortunately, bamboo exposes a solution to this.
  
  Notice that the result of each transformation is automatically passed to the next transformation.  This allows one to do more complicated transformations in succession
  
- 
- bamboo.BambooObjects.BambooGroupBy(df.groupby('group')) \
-    .filter_groups(lambda x: x['feature1'].mean() > 0) \
-    .sorted_groups(lambda x: x['feature2'].mean()) \
-    .map_groups(lambda x: x['feature1'] + x['feature2'])\
-    .head()
+    bamboo.BambooObjects.BambooGroupBy(df.groupby('group'))\
+        .filter_groups(lambda x: x['feature1'].mean() > 0)\
+        .sorted_groups(lambda x: x['feature2'].mean())\
+        .map_groups(lambda x: x['feature1'] + x['feature2'])\
+        .hist()
+    
