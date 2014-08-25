@@ -1,18 +1,13 @@
 
 
-import pandas as pd
-from pandas.core.groupby import GroupBy
-
 from inspect import getmembers, isfunction
-
 from groups import take_groups
 
+import BambooObjects
 
 
-
-"""
-Miscellaneous functions acting on various objects
-"""
+def wrap(obj):
+    return BambooObjects._wrap_with_bamboo(obj)
 
 
 def head(frame, n=5, ngroups=5):
