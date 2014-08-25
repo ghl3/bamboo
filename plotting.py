@@ -14,7 +14,7 @@ from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
 
 from frames import group_by_binning
-from groups import groupmap
+from groups import map_groups
 from helpers import NUMERIC_TYPES
 
 
@@ -150,7 +150,7 @@ def hist_functions(grouped, functions, cols=2, **kwargs):
 
     for i, function in enumerate(functions):
         plt.subplot(rows, cols, i+1)
-        hist(groupmap(grouped, function), **kwargs)
+        hist(map_groups(grouped, function), **kwargs)
         plt.xlabel(function.__name__)
 
 

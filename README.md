@@ -4,9 +4,8 @@ bamboo
 Bamboo is a library that provides a set of tools intended to be used with Pandas.  It's primary goal is to make it easier and more intuitive to handle and visualize data.  Its design has an emphasis on immutable and composable functions that can be chained together to form more complicated data transformations.
 
 
-Example
+Examples
 -------
-  
   
 For these examples, assume that we have a Pandas DataFrame structured similarly to the following:
   
@@ -36,3 +35,30 @@ Imagine that we want to group our data by the class column but only return those
 
 
 The return value is a DataFrameGroupBy with only two of the three groups remaining (those that satisfy the given predicate).
+
+
+A common practice is to create overlapping plots of data broken up by a class.  This is easy with bamboo.
+
+    hist(df.groupby('group')['feature1'])
+
+
+Bamboo functions are meant to be composable.  So, let's say that I want to group by the group, filter out groups with a small mean of feature1, and then sort the reamining groups by their mean of feature 2.  One can simply do:
+
+    sorted_groups(filter_groups(df.groupby('group'), lambda x: x['feature1'].mean() > 0), lambda x: x['feature2'].mean())
+
+While this works, composing functions like this can make them become less and less readable (and makes it harder to write).  People familiar with lisp languages are familiar with this.
+
+Fortunately, bamboo exposes a solution to this.
+
+    bamboo.BambooObjects.BambooGroupBy(df.groupby('group')) \
+        .filter_groups(lambda x: x['feature1'].mean() > 0) \
+        .sorted_groups(lambda x: x['feature2'].mean())
+ 
+ Notice that the result of each transformation is automatically passed to the next transformation.  This allows one to do more complicated transformations in succession
+ 
+ 
+ bamboo.BambooObjects.BambooGroupBy(df.groupby('group')) \
+    .filter_groups(lambda x: x['feature1'].mean() > 0) \
+    .sorted_groups(lambda x: x['feature2'].mean()) \
+    .map_groups(lambda x: x['feature1'] + x['feature2'])\
+    .head()

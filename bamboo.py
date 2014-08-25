@@ -22,8 +22,10 @@ def head(frame, n=5, ngroups=5):
     """
 
     if isinstance(frame, GroupBy):
+        print "Is grupby"
         return take_groups(frame, ngroups).apply(lambda x: x.head(n))
     else:
+        print "not groupby"
         return frame.head(n)
 
 

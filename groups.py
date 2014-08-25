@@ -21,6 +21,8 @@ def filter_groups(dfgb, filter_function, on_index=False):
     to the group value (the index)
     """
 
+    print "Filtering groups"
+
     return_groups = []
 
     for val, group in dfgb: #range(0, dfgb.ngroups):
@@ -46,7 +48,6 @@ def sorted_groups(dfgb, key):
     for name, group in dfgb:
 
         sort_val = key(group)
-        print name, sort_val
         sort_list.append((sort_val, group))
 
     sorted_groups = [group for val, group
@@ -55,15 +56,22 @@ def sorted_groups(dfgb, key):
     return combine_data_frames(sorted_groups).groupby(dfgb.keys, sort=False)
 
 
-def groupmap(grouped, func):
+def map_groups(grouped, func):
     """
     Take a DataFrameGroupBy and apply a function
     to the DataFrames, returning a seriesgroupby
     of the values
     """
 
+    print "Mapping Group"
+    
     transformed = grouped.obj.apply(func, axis=1)
-    return transformed.groupby(grouped.grouper)
+    #transformed = grouped.apply(func) #, axis=1)
+    return transformed.groupby(grouped.grouper) #keys) #grouper)
+
+    #return_groups = []
+
+    #for name, group in grouped:
 
 
 def take_groups(dfgb, n):
