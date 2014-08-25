@@ -57,8 +57,10 @@ Fortunately, bamboo exposes a solution to this.
  Notice that the result of each transformation is automatically passed to the next transformation.  This allows one to do more complicated transformations in succession
  
     bamboo.BambooObjects.BambooGroupBy(df.groupby('group'))\
-        .filter_groups(lambda x: x['feature1'].mean() > 0)\
+        .filter_groups(lambda x: x['group'].mean() > 0)\
         .sorted_groups(lambda x: x['feature2'].mean())\
-        .map_groups(lambda x: x['feature1'] + x['feature2'])\
+        .map_groups(lambda x: x['feature1'].mean())\
+        .sum()\
         .hist()
     
+Let's describe what's going here for the sake of completeness.  We start with a normal dataframe and group it by the 'group' column.  This turns it into a DataFrameGroupBy.  We then wrap this in a BambooGroupBy so that we can run a chain of transformations on it.  We start with a filter that requires that all remaining groups have a mean of their group column greater than 0.  Next, we sort the groups, ordering them by the mean of their 'feature2' column.  Then, we map a function over each row in each group, taking the mean of 'feature2'.  This turns the underlying object from a multi-column data frame into a data frame of only one column (the result of our mapping function).  Finally, we take the sum of that value within each group.  We end by making a histogram of the resulting object, which has a single value for each group.

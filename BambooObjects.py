@@ -20,7 +20,7 @@ def _create_bamboo_wrapper(obj, func):
             return BambooDataFrame(res)
         elif isinstance(res, pandas.core.groupby.SeriesGroupBy):
             return BambooSeriesGroupBy(res)
-        elif isinstance(res, pandas.core.groupby.GroupBy):
+        elif isinstance(res, pandas.core.groupby.DataFrameGroupBy):
             return BambooGroupBy(res)
         else:
             return res
@@ -80,12 +80,10 @@ class BambooDataFrame(pandas.DataFrame):
         return super(BambooDataFrame, self).__getattribute__(*args, **kwargs)
 
 
-
-
-class BambooGroupBy(pandas.core.groupby.GroupBy):
+class BambooGroupBy(pandas.core.groupby.DataFrameGroupBy):
 
     def __init__(self, other):
-        if not isinstance(other, pandas.core.groupby.GroupBy):
+        if not isinstance(other, pandas.core.groupby.DataFrameGroupBy):
             raise TypeError()
 
         super(BambooGroupBy, self).__init__(
