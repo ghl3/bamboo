@@ -58,7 +58,7 @@ Fortunately, bamboo exposes a solution to this.
  
     from bamboo.bamboo import wrap
 
-    wrap(df.groupby('group')) \
+    wrap(df).groupby('group') \
         .filter_groups(lambda x: x['group'].mean() > 0) \
         .sorted_groups(lambda x: x['feature2'].mean()) \
         .map_groups(lambda x: x['feature1'].mean()) \
