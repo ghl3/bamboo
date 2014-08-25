@@ -15,21 +15,37 @@ _plot_methods = {name:func  for name, func in getmembers(plotting) if isfunction
 
 
 def _wrap_with_bamboo(obj):
+
+    print "Insider the wrapper: %s" % type(obj)
+
     if isinstance(obj, pandas.DataFrame):
+        print "Making it a BambooDataFrame"
         return BambooDataFrame(obj)
+
     elif isinstance(obj, pandas.core.groupby.SeriesGroupBy):
         return BambooSeriesGroupBy(obj)
+
     elif isinstance(obj, pandas.core.groupby.DataFrameGroupBy):
         return BambooDataFrameGroupBy(obj)
+
     else:
+        print "Using native method"
         return obj
 
 
 def _create_bamboo_wrapper(obj, func):
+    print "Wrapping with bamboo"
     def callable(*args, **kwargs):
         res = func(obj, *args, **kwargs)
         return _wrap_with_bamboo(res)
     return callable
+
+# def _create_bamboo_wrapper_2(func):
+#     print "Wrapping with bamboo"
+#     def callable(*args, **kwargs):
+#         res = func(*args, **kwargs)
+#         return _wrap_with_bamboo(res)
+#     return callable
 
 
 class BambooDataFrame(pandas.DataFrame):
@@ -37,9 +53,14 @@ class BambooDataFrame(pandas.DataFrame):
     def __init__(self, *args, **kwargs):
         super(BambooDataFrame, self).__init__(*args, **kwargs)
 
+#    def __getattribute__(self, name):
+#        return  _create_bamboo_wrapper(self, object.__getattribute__(self, name))
+
     def __getattr__(self, *args, **kwargs):
 
         name, pargs = args[0], args[1:]
+
+        print "Getting function: %s" % name
 
         if name in _bamboo_methods:
             return _create_bamboo_wrapper(self, _bamboo_methods[name])
@@ -50,7 +71,9 @@ class BambooDataFrame(pandas.DataFrame):
         if name in _frames_methods:
             return _create_bamboo_wrapper(self, _frames_methods[name])
 
-        return super(BambooDataFrame, self).__getattribute__(*args, **kwargs)
+        print "Using native method"
+        return _create_bamboo_wrapper(self, super(BambooDataFrame, self).__getattribute__(*args, **kwargs))
+#        return super(BambooDataFrame, self).__getattribute__(*args, **kwargs)
 
 
 class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
@@ -88,7 +111,8 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
         if name in _groups_methods:
             return _create_bamboo_wrapper(self, _groups_methods[name])
 
-        return super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs)
+        return _create_bamboo_wrapper(self, super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs))
+#        return super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs)
 
 
 class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
@@ -125,5 +149,5 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
         if name in _groups_methods:
             return _create_bamboo_wrapper(self, _groups_methods[name])
 
-        return super(BambooSeriesGroupBy, self).__getattribute__(*args, **kwargs)
+        return _create_bamboo_wrapper(self, super(BambooSeriesGroupBy, self).__getattribute__(*args, **kwargs))
 

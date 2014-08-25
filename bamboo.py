@@ -1,4 +1,5 @@
 
+from pandas.core.groupby import GroupBy
 
 from inspect import getmembers, isfunction
 from groups import take_groups
