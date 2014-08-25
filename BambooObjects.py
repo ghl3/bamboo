@@ -88,7 +88,6 @@ class BambooGroupBy(pandas.core.groupby.GroupBy):
         if not isinstance(other, pandas.core.groupby.GroupBy):
             raise TypeError()
 
-        print "Doing Stuff"
         super(BambooGroupBy, self).__init__(
                                              other.obj,
                                              other.keys,

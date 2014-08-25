@@ -21,8 +21,6 @@ def filter_groups(dfgb, filter_function, on_index=False):
     to the group value (the index)
     """
 
-    print "Filtering groups"
-
     return_groups = []
 
     for val, group in dfgb: #range(0, dfgb.ngroups):
@@ -63,8 +61,6 @@ def map_groups(grouped, func):
     of the values
     """
 
-    print "Mapping Group"
-    
     transformed = grouped.obj.apply(func, axis=1)
     #transformed = grouped.apply(func) #, axis=1)
     return transformed.groupby(grouped.grouper) #keys) #grouper)
