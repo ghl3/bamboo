@@ -3,6 +3,9 @@ import pandas
 
 from helpers import combine_data_frames
 
+from types import *
+import inspect
+
 """
 
 Functions that act on data frame group by objects
@@ -54,20 +57,18 @@ def sorted_groups(dfgb, key):
     return combine_data_frames(sorted_groups).groupby(dfgb.keys, sort=False)
 
 
-def map_groups(grouped, func):
+def map_groups(grouped, func, name=None):
     """
     Take a DataFrameGroupBy and apply a function
     to the DataFrames, returning a seriesgroupby
     of the values
     """
 
-    transformed = grouped.obj.apply(func, axis=1)
-    #transformed = grouped.apply(func) #, axis=1)
-    return transformed.groupby(grouped.grouper) #keys) #grouper)
+    if name is None:
+        name = func.__name__
 
-    #return_groups = []
-
-    #for name, group in grouped:
+    transformed = grouped.obj.apply(func, axis=1, reduce=False)
+    return pandas.DataFrame({name: transformed}).groupby(grouped.grouper)
 
 
 def take_groups(dfgb, n):
