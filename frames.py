@@ -4,6 +4,9 @@ import pandas as pd
 
 from helpers import NUMERIC_TYPES
 
+from collections import OrderedDict
+
+
 """
 Functions that act on data frames
 """
@@ -62,19 +65,67 @@ def take(df, var, exclude=None):
     return (df[var], df[rest])
 
 
+
+def sort_rows(df, key=None):
+    """
+    Sort a dataframe's rows.
+    If required, a key function should be
+    a function that acts on a row and
+    orders the dataframe by the value
+    of the function evaluated on every row.
+    """
+
+    if not key:
+        return df.sort(inplace=False)
+
+    vals = df.apply(key, axis=1)
+    vals.sort()
+    return df.ix[vals.index]
+
+def sort_columns(df, key=None, by_name=False):
+    """
+    Sort a DataFrame by its columns, either by
+    functions of the column names or by functions
+    of the values of the columns themselves.
+    """
+
+    items = []
+
+    for idx, colname in enumerate(df):
+
+        if by_name:
+            val = key(colname)
+        else:
+            val = key(df[colname])
+        items.append((idx, val))
+
+    items.sort(key=lambda x: x[1])
+
+    return df.icol([idx for idx, val in items])
+
+
 def apply_all(df, *args, **kwargs):
     """
     Return a new dataframe consisting of
     a number of functions applied to the
     current dataframe
+
+    If the input object is a DataFrameGroupBy,
+    the args functions should (but don't have to)
+    be aggregations on the columns that return
+    single variables (such that each group has
+    only one value)
     """
 
-    if 'axis' not in kwargs:
+    if isinstance(df, pd.DataFrame) and 'axis' not in kwargs:
         kwargs['axis']=1
 
-    res = {}
-    for arg in args:
-        res[arg.__name__] = df.apply(arg, **kwargs)
+    res = OrderedDict()
+    for idx, arg in enumerate(args):
+        name = arg.__name__
+        if name == '<lambda>':
+            name += '_{}'.format(idx)
+        res[name] = df.apply(arg, **kwargs)
     return pd.DataFrame(res)
 
 

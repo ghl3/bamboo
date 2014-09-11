@@ -12,6 +12,7 @@ Functions that act on data frame group by objects
 
 """
 
+
 def filter_groups(dfgb, filter_function, on_index=False):
     """
     Filter the groups of a DataFrameGroupBy
@@ -87,3 +88,10 @@ def take_groups(dfgb, n):
     return combine_data_frames(return_groups).groupby(dfgb.keys)
 
 
+
+def pivot_groups(dfgb, **kwargs):
+    """
+    Pivot a DataFrameGroupBy.
+    Takes all the normal keyword args of a pivot
+    """
+    return dfgb.reset_index().pivot(**kwargs)
