@@ -57,7 +57,9 @@ class BambooDataFrame(pandas.DataFrame):
         if name in _frames_methods:
             return _create_bamboo_wrapper(self, _frames_methods[name])
 
-        return _create_bamboo_wrapper(self, super(BambooDataFrame, self).__getattribute__(*args, **kwargs))
+        res = super(BambooDataFrame, self).__getattr__(*args, **kwargs)
+        return _wrap_with_bamboo(res)
+        #return _create_bamboo_wrapper(self, super(BambooDataFrame, self).__getattribute__(*args, **kwargs))
 
 
 class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
@@ -79,8 +81,10 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
                                              other.group_keys,
                                              other.squeeze)
 
+
     def head(self, *args, **kwargs):
         return bamboo.head(self, *args, **kwargs)
+
 
     def __getattr__(self, *args, **kwargs):
 
@@ -95,7 +99,9 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
         if name in _groups_methods:
             return _create_bamboo_wrapper(self, _groups_methods[name])
 
-        return _create_bamboo_wrapper(self, super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs))
+        res = super(BambooDataFrameGroupBy, self).__getattr__(*args, **kwargs)
+        return _wrap_with_bamboo(res)
+        #return _create_bamboo_wrapper(self, res)
 
 
 class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
@@ -132,5 +138,7 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
         if name in _groups_methods:
             return _create_bamboo_wrapper(self, _groups_methods[name])
 
-        return _create_bamboo_wrapper(self, super(BambooSeriesGroupBy, self).__getattribute__(*args, **kwargs))
+        res = super(BambooSeriesGroupBy, self).__getattr__(*args, **kwargs)
+        return _wrap_with_bamboo(res)
+        #return _create_bamboo_wrapper(self, super(BambooSeriesGroupBy, self).__getattribute__(*args, **kwargs))
 
