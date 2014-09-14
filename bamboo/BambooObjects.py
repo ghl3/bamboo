@@ -11,7 +11,7 @@ import bamboo, groups, frames, plotting
 _bamboo_methods = {name:func  for name, func in getmembers(bamboo) if isfunction(func)}
 _frames_methods = {name:func  for name, func in getmembers(frames) if isfunction(func)}
 _groups_methods = {name:func  for name, func in getmembers(groups) if isfunction(func)}
-_plot_methods = {name:func  for name, func in getmembers(plotting) if isfunction(func)}
+_plot_methods = {} #{name:func  for name, func in getmembers(plotting) if isfunction(func)}
 
 
 def _wrap_with_bamboo(obj):

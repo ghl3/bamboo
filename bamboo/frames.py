@@ -7,6 +7,8 @@ from helpers import NUMERIC_TYPES
 from collections import OrderedDict
 
 
+import matplotlib.pyplot as plt
+
 """
 Functions that act on data frames
 """
@@ -251,3 +253,37 @@ def get_rows_with_null(df):
     """
     null_row_counts = pd.isnull(df).sum(axis=1)
     return df[null_row_counts > 0]
+
+
+def hexbin(df, x, y, **kwargs):
+    plt.hexbin(df[x].values, df[y].values)
+    plt.xlabel(x)
+    plt.ylabel(y)
+    plt.colorbar()
+
+
+def boxplot(df, x, y, bins=None):
+    """ Draw a boxplot using the
+    variables x and y.
+    Include ticks
+    If 'bins' is not none, group the x-axis
+    variable into the supplied bins
+    """
+
+    from pandas.tools.plotting import boxplot_frame_groupby
+    if bins is None:
+        boxplot_frame_groupby(df.groupby(x)[y], subplots=False, return_type='dict')
+    else:
+        boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False, return_type='dict')
+
+
+def scatter(df, x, y, **kwargs):
+    """
+    Takes a grouped data frame and draws a scatter
+    plot of the suppied variables wtih a different
+    color for each group
+    """
+    ax = plt.gca()
+    plt.scatter(df[x], df[y], **kwargs)
+    plt.xlabel(x)
+    plt.ylabel(y)
