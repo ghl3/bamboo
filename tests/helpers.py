@@ -1,4 +1,6 @@
 
+import matplotlib.pyplot as plt
+
 import pandas
 
 from pandas.util.testing import assert_frame_equal, assert_panelnd_equal
@@ -6,6 +8,7 @@ from pandas.util.testing import assert_frame_equal, assert_panelnd_equal
 from bamboo.core import head
 
 from functools import wraps
+from nose.plugins.attrib import attr
 
 def assert_equals(obj1, obj2):
 
@@ -73,14 +76,13 @@ def create_test_df_v2():
     return df
 
 
-
-def plotting_test(test):
+def plotting(test):
 
     @wraps(test)
-    def test_wrapper(name):
+    def test_wrapper(*args, **kwargs):
         plt.clf()
-        res = test()
-        plt.safefig(test.__name__+".png")
+        res = test(*args, **kwargs)
+        plt.savefig('tests/images/'+test.__name__+".png")
         return res
 
-    return func_wrapper
+    return test_wrapper

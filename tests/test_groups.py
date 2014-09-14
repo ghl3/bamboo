@@ -64,32 +64,33 @@ def test_sort_v2():
     eq_(group_order, [3, 0, 4, 1])
 
 
-@plotting_test
+@plotting
 def test_hist_functions():
 
     dfgb = create_test_df_v2().groupby('group')
-
     hist_functions(dfgb, lambda x: x.feature1+x.feature2, lambda x: x.feature1-x.feature2)
 
 
+@plotting
 def test_scatter():
 
     dfgb = create_test_df_v2().groupby('group')
-
     scatter(dfgb, 'feature1', 'feature2')
 
-
+@plotting
 def test_stacked_counts_plot():
 
     dfgb = create_test_df_v2().groupby('group')
-
     stacked_counts_plot(dfgb, 'feature1')
 
+@plotting
+def test_stacked_counts_plot_ratio():
+
+    dfgb = create_test_df_v2().groupby('group')
     stacked_counts_plot(dfgb, 'feature1', ratio=True)
 
 
 def test_pivot_groups():
 
     dfgb = create_test_df_v2().groupby(['group', 'feature1'])
-
     pivot_groups(dfgb, lambda x: x.feature2)
