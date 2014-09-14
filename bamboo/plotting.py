@@ -40,21 +40,21 @@ def boxplot(df, x, y, bins=None):
         boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False, return_type='dict')
 
 
-def hist(grouped, var=None, *args, **kwargs):
+def hist(dfgb, var=None, *args, **kwargs):
     """
     Takes a data frame (grouped by a variable)
     and plots histograms of the variable 'var'
     for each of the groups.
     """
 
-    if isinstance(grouped, pd.core.groupby.SeriesGroupBy):
-        _series_hist(grouped, *args, **kwargs)
+    if isinstance(dfgb, pd.core.groupby.SeriesGroupBy):
+        _series_hist(dfgb, *args, **kwargs)
 
-    elif isinstance(grouped, pd.core.groupby.DataFrameGroupBy):
+    elif isinstance(dfgb, pd.core.groupby.DataFrameGroupBy):
         if var is not None:
-            _series_hist(grouped[var], *args, **kwargs)
+            _series_hist(dfgb[var], *args, **kwargs)
         else:
-            for (var, series) in grouped._iterate_column_groupbys():
+            for (var, series) in dfgb._iterate_column_groupbys():
                 plt.figure()
                 try:
                     _series_hist(series, *args, **kwargs)
@@ -68,7 +68,7 @@ def hist(grouped, var=None, *args, **kwargs):
         pass
 
 
-def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False, *args, **kwargs):
+def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -79,15 +79,15 @@ def _series_hist(grouped, ax=None, normed=False, normalize=False, autobin=False,
 
     normed_or_normalize = normed or normalize
 
-    if grouped.obj.dtype in NUMERIC_TYPES:
-        _series_hist_float(grouped, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
+    if dfgb.obj.dtype in NUMERIC_TYPES:
+        _series_hist_float(dfgb, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
     else:
-        _series_hist_nominal(grouped, ax, normalize=normed_or_normalize, *args, **kwargs)
+        _series_hist_nominal(dfgb, ax, normalize=normed_or_normalize, *args, **kwargs)
 
     plt.legend(loc='best', fancybox=True)
 
 
-def _series_hist_float(grouped, ax=plt.gca(), autobin=False, normed=False, normalize=False,
+def _series_hist_float(dfgb, ax=plt.gca(), autobin=False, normed=False, normalize=False,
                        stacked=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
@@ -96,11 +96,11 @@ def _series_hist_float(grouped, ax=plt.gca(), autobin=False, normed=False, norma
     """
 
     if autobin and 'bins' not in kwargs:
-        kwargs['bins'] = get_variable_binning(grouped.obj)
+        kwargs['bins'] = get_variable_binning(dfgb.obj)
 
     color_cycle = ax._get_lines.color_cycle
 
-    for (color, (key, srs)) in zip(color_cycle, grouped):
+    for (color, (key, srs)) in zip(color_cycle, dfgb):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
@@ -113,7 +113,7 @@ def _series_hist_float(grouped, ax=plt.gca(), autobin=False, normed=False, norma
         srs.hist(ax=ax, color=color, label=str(label), normed=normed, **kwargs)
 
 
-def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
+def _series_hist_nominal(dfgb, ax=None, normalize=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -122,7 +122,7 @@ def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
 
     color_cycle = ax._get_lines.color_cycle
 
-    for (color, (key, srs)) in zip(color_cycle, grouped):
+    for (color, (key, srs)) in zip(color_cycle, dfgb):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
@@ -136,7 +136,7 @@ def _series_hist_nominal(grouped, ax=None, normalize=False, *args, **kwargs):
         value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
 
 
-def hist_functions(grouped, functions, cols=2, **kwargs):
+def hist_functions(dfgb, functions, cols=2, **kwargs):
     """
     Take a DataFrameGroupBy and a list of functions and make a
     grid of plots showing a histogram of the values of each
@@ -150,11 +150,11 @@ def hist_functions(grouped, functions, cols=2, **kwargs):
 
     for i, function in enumerate(functions):
         plt.subplot(rows, cols, i+1)
-        hist(map_groups(grouped, function), **kwargs)
+        hist(map_groups(dfgb, function), **kwargs)
         plt.xlabel(function.__name__)
 
 
-def scatter(grouped, x, y, **kwargs):
+def scatter(dfgb, x=None, y=None, **kwargs):
     """
     Takes a grouped data frame and draws a scatter
     plot of the suppied variables wtih a different
@@ -162,14 +162,14 @@ def scatter(grouped, x, y, **kwargs):
     """
     ax = plt.gca()
     color_cycle = ax._get_lines.color_cycle
-    for (color, (key, grp)) in zip(color_cycle, grouped):
+    for (color, (key, grp)) in zip(color_cycle, dfgb):
         plt.scatter(grp[x], grp[y], color=color, label=key, **kwargs)
     plt.legend(loc='best')
     plt.xlabel(x)
     plt.ylabel(y)
 
 
-def stacked_counts_plot(grouped, category, ratio=False, **kwargs):
+def stacked_counts_plot(dfgb, category, ratio=False, **kwargs):
     """
     Takes a dataframe that has been grouped and
     plot a stacked bar-plot representing the makeup of
@@ -190,7 +190,7 @@ def stacked_counts_plot(grouped, category, ratio=False, **kwargs):
     as a barplot
     """
 
-    counts = grouped[category].value_counts().unstack().fillna(0.)
+    counts = dfgb[category].value_counts().unstack().fillna(0.)
 
     if ratio:
         denom = counts.sum(axis=1)
@@ -202,7 +202,7 @@ def stacked_counts_plot(grouped, category, ratio=False, **kwargs):
         plt.setp(container, width=1)
 
 
-def _draw_stacked_plot(grouped, **kwargs):
+def _draw_stacked_plot(dfgb, **kwargs):
     """
     Draw a vertical bar plot of multiple series
     stacked on top of each other
@@ -215,14 +215,14 @@ def _draw_stacked_plot(grouped, **kwargs):
 
     series_dict = {}
 
-    for (key, srs) in grouped:
+    for (key, srs) in dfgb:
         series_dict[key] = srs
 
     df_for_plotting = pd.DataFrame(series_dict)
     df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
 
 
-def _save_plots(grouped, plot_func, output_file, title=None, *args, **kwargs):
+def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
     """
     Take a grouped dataframe and save a pdf of
     the histogrammed variables in that dataframe.
@@ -236,7 +236,7 @@ def _save_plots(grouped, plot_func, output_file, title=None, *args, **kwargs):
 
     subplots = PdfSubplots(pdf, 3, 3)
 
-    for (var, series) in grouped._iterate_column_groupbys():
+    for (var, series) in dfgb._iterate_column_groupbys():
 
         subplots.next_subplot()
         try:
@@ -251,8 +251,8 @@ def _save_plots(grouped, plot_func, output_file, title=None, *args, **kwargs):
     pdf.close()
 
 
-def save_grouped_hists(grouped, output_file, title=None, *args, **kwargs):
-    _save_plots(grouped, _series_hist, output_file, title, *args, **kwargs)
+def save_grouped_hists(dfgb, output_file, title=None, *args, **kwargs):
+    _save_plots(dfgb, _series_hist, output_file, title, *args, **kwargs)
 
 
 def get_variable_binning(var, nbins=10, int_bound=40):

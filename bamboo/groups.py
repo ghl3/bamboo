@@ -1,5 +1,7 @@
 
-import pandas
+from collections import OrderedDict
+
+import pandas as pd
 
 from helpers import combine_data_frames
 
@@ -27,8 +29,7 @@ def filter_groups(dfgb, filter_function, on_index=False):
 
     return_groups = []
 
-    for val, group in dfgb: #range(0, dfgb.ngroups):
-        #group = dfgb.get_group(i)
+    for val, group in dfgb:
         if on_index and filter_function(val):
             return_groups.append(group)
         if not on_index and filter_function(group):
@@ -58,7 +59,7 @@ def sorted_groups(dfgb, key):
     return combine_data_frames(sorted_groups).groupby(dfgb.keys, sort=False)
 
 
-def map_groups(grouped, func, name=None):
+def map_groups(dfgb, func, name=None):
     """
     Take a DataFrameGroupBy and apply a function
     to the DataFrames, returning a seriesgroupby
@@ -68,8 +69,8 @@ def map_groups(grouped, func, name=None):
     if name is None:
         name = func.__name__
 
-    transformed = grouped.obj.apply(func, axis=1, reduce=False)
-    return pandas.DataFrame({name: transformed}).groupby(grouped.grouper)
+    transformed = dfgb.obj.apply(func, axis=1, reduce=False)
+    return pd.DataFrame({name: transformed}).groupby(dfgb.grouper)
 
 
 def take_groups(dfgb, n):
@@ -88,10 +89,30 @@ def take_groups(dfgb, n):
     return combine_data_frames(return_groups).groupby(dfgb.keys)
 
 
-
 def pivot_groups(dfgb, **kwargs):
     """
     Pivot a DataFrameGroupBy.
     Takes all the normal keyword args of a pivot
     """
     return dfgb.reset_index().pivot(**kwargs)
+
+
+def apply_groups(dfgb, *args, **kwargs):
+    """
+    Return a DataFrameGroupBy object with each
+    group of the original DataFrameGroupBy
+    transformed into a new dataframe, where
+    each column of these new dataframes is the
+    result of one of the arg functions supplied.
+    """
+
+    res = OrderedDict()
+    for idx, arg in enumerate(args):
+        name = arg.__name__
+        if name == '<lambda>':
+            name += '_{}'.format(idx)
+        res[name] = dfgb.obj.apply(arg, axis=1, **kwargs)
+
+    return pd.DataFrame(res).groupby(dfgb.grouper)
+
+
