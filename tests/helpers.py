@@ -82,7 +82,9 @@ def plotting(test):
     def test_wrapper(*args, **kwargs):
         plt.clf()
         res = test(*args, **kwargs)
-        plt.savefig('tests/images/'+test.__name__+".png")
+
+        file_name = 'tests/images/{}_{}.png'.format(test.__module__, test.__name__)
+        plt.savefig(file_name)
         return res
 
     return test_wrapper

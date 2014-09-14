@@ -3,6 +3,8 @@ import pandas
 import bamboo.groups
 import bamboo.frames
 
+from helpers import *
+
 group = ['A', 'A', 'A', 'A',
          'B', 'B',
          'C']
@@ -19,15 +21,19 @@ df = pandas.DataFrame({'group':group,
                        'feature1':feature1,
                        'feature2':feature2})
 
+@plotting
 def test_boxplot():
     bamboo.frames.boxplot(df, 'feature1', 'feature2')
 
+@plotting
 def test_hexbin():
     bamboo.frames.hexbin(df, 'feature1', 'feature2')
 
+@plotting
 def test_hist_df():
     bamboo.groups.hist(df.groupby('group'))
 
+@plotting
 def test_hist_var():
     bamboo.groups.hist(df.groupby('group'), 'feature1')
 

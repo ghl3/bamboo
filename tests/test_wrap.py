@@ -8,7 +8,7 @@ from bamboo.core import wrap
 import numpy as np
 
 
-
+@plotting
 def test_wrap():
 
     df = create_test_df_v2()
@@ -32,7 +32,7 @@ def test_filter_groups():
         .feature1\
         .value_counts()
 
-
+@plotting
 def test_filter_groups_hist():
 
     df = create_test_df_v2()
@@ -57,7 +57,7 @@ def test_sorted_groups():
 
 def test_map_groups():
 
-    df = create_test_df_v2() 
+    df = create_test_df_v2()
 
     return wrap(df)\
         .groupby(df['group'])\
@@ -65,7 +65,7 @@ def test_map_groups():
         .mean()\
         .sort('feature1_minus_feature2')
 
-
+@plotting
 def test_apply_groups():
 
     df = create_test_df_v2()
