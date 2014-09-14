@@ -1,9 +1,4 @@
 
-from core import wrap
+from core import *
 
-import bamboo.groups
-import bamboo.frames
-import bamboo.plotting
-
-
-__all__ = ['core', 'plotting', 'frames', 'groups', 'modeling']
+__all__ = ['core', 'frames', 'groups', 'modeling']
