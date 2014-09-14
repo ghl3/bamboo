@@ -1,3 +1,5 @@
+.coverage
+cover
 build
 dist
 bamboo.egg-info
@@ -6,3 +8,4 @@ bamboo.egg-info
 *.ipynb
 .DS_Store
 setup.sh
+test.sh
