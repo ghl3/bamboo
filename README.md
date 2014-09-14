@@ -77,7 +77,7 @@ Bamboo also makes it easy to plot transformed data.  A common desire in data ana
         .feature1 \
         .hist(ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
 
-![alt tag](https://raw.github.com/ghl3/bamboo/images/image1.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/image1.png)
 
 
     wrap(df) \
@@ -85,5 +85,4 @@ Bamboo also makes it easy to plot transformed data.  A common desire in data ana
         .map_groups(lambda x: x.feature1 + x.feature1, name='mean') \
         .hist(ax=plt.gca(), bins=np.arange(-100, 100, 10), alpha=0.5)
 
-
-![alt tag](https://raw.github.com/ghl3/bamboo/images/image2.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/image2.png)
