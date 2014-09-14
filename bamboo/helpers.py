@@ -23,3 +23,31 @@ def combine_data_frames(frames):
         return first.append(list(frames[1:]))
 
 
+def get_nominal_integer_dict(nominal_vals):
+    """
+    Takes a set of nominal values (non-numeric)
+    and returns a dictionary that maps each value
+    to a unique integer
+    """
+    d = {}
+    for val in nominal_vals:
+        if val not in d:
+            current_max = max(d.values()) if len(d) > 0 else -1
+            d[val] = current_max+1
+    return d
+
+
+
+def convert_nominal_to_int(srs, return_dict=False):
+    """
+    Convert a series of nominal values
+    into a series of integers
+    """
+    d = get_nominal_integer_dict(srs)
+    result =  srs.map(lambda x: d[x])
+    if return_dict:
+        return (result, d)
+    else:
+        return result
+
+

@@ -76,6 +76,22 @@ def create_test_df_v2():
     return df
 
 
+def create_test_df_v3():
+    group = ['A', 'A', 'A',
+             'B', 'B', 'B']
+
+    feature1 = [1, 1, 1,
+                2, 2, 2]
+
+    feature2 = [10.0, 10.5, 9.5,
+                11.0, 20.0, 20.0]
+
+    df = pandas.DataFrame({'group':group,
+                           'feature1':feature1,
+                           'feature2':feature2})
+    return df
+
+
 def plotting(test):
 
     @wraps(test)

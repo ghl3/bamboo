@@ -2,7 +2,7 @@ from __future__ import division
 
 import pandas as pd
 
-from helpers import NUMERIC_TYPES
+from helpers import NUMERIC_TYPES, convert_nominal_to_int
 
 from collections import OrderedDict
 
@@ -84,9 +84,14 @@ def sort_rows(df, key=None):
     return df.ix[vals.index]
 
 
-def sort_columns(df, key=None, by_name=False):
+def sort_columns(df, key, by_name=False):
     """
-    Sort a DataFrame by its columns, either by
+    Sort the columns of a DataFrame by the given key function
+    - If by_name is true, the key function must take the column
+      names as an argument
+    - if by_name is false, the key function must take the
+      columns themselves as an argument (and must return a sortable object)
+    DataFrame by its columns, either by
     functions of the column names or by functions
     of the values of the columns themselves.
     """
@@ -134,8 +139,9 @@ def apply_all(df, *args, **kwargs):
 def map_functions(df, functions):
     """
     Takes an input data frame and a map of
-    function namesto functions that each are
+    {function names: functions} that each are
     to act row-wise on the input dataframe.
+
     Return a DataFrame whose columns are
     the result of those functions on the
     input dataframe.
@@ -174,52 +180,25 @@ def get_numeric_features(df):
     return df[float_feature_names]
 
 
-def get_nominal_integer_dict(nominal_vals):
-    """
-    Takes a set of nominal values (non-numeric)
-    and returns a dictionary that maps each value
-    to a unique integer
-    """
-    d = {}
-    for val in nominal_vals:
-        if val not in d:
-            current_max = max(d.values()) if len(d) > 0 else -1
-            d[val] = current_max+1
-    return d
-
-
-def convert_to_integer(srs, return_dict=False):
-    """
-    Convert a series of nominal values
-    into a series of integers
-    """
-    d = get_nominal_integer_dict(srs)
-    result =  srs.map(lambda x: d[x])
-    if return_dict:
-        return (result, d)
-    else:
-        return result
-
-
-def convert_strings_to_integer(df):
+def convert_nominals_to_int(df):
     ret = pd.DataFrame()
     for column_name in df:
         column = df[column_name]
         if column.dtype not in NUMERIC_TYPES:
-            ret[column_name] = convert_to_integer(column)
+            ret[column_name] = convert_nominal_to_int(column)
         else:
             ret[column_name] = column
     return ret
 
 
-def get_index_rows(srs, indices):
+def get_index_rows(df, indices):
     """
     Given a dataframe and a list of indices,
     return a list of row numbers corresponding
     to the supplied indices (maintaining order)
     """
     rows = []
-    for i, (index, row) in enumerate(srs.iteritems()):
+    for i, (index, row) in enumerate(df.iteritems()):
         if index in indices:
             rows.append(i)
     return rows
