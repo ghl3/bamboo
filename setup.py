@@ -23,5 +23,6 @@ setup(
     author="George Herbert Lewis",
     author_email="ghl227@gmail.com",
     packages=["bamboo"],
+    license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
     description="Data manipulation for python using Pandas",
 )
