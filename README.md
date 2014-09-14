@@ -6,9 +6,9 @@ Bamboo is a library that provides a set of tools intended to be used with Pandas
 
 Examples
 -------
-  
+
 For these examples, assume that we have a Pandas DataFrame structured similarly to the following:
-  
+
 | id | class | feature1 | feature2 |
 |----|-------|----------|----------|
 | 1  | 0     | 10.0     | 100      |
@@ -24,7 +24,7 @@ Much of bamboo's functionality involves manipulating grouped data frames, someth
 Imagine that we want to group our data by the class column but only return those groups that have an average of feature1 > 0:
 
     filter_groups(df.groupby('group'), lambda x: x['feature1'].mean() > 0)
-    
+
 |       |   | group | feature1 | feature2 |
 |-------|---|-------|----------|----------|
 | **group** |   |       |          |          |
@@ -46,17 +46,19 @@ Bamboo functions are meant to be composable.  So, let's say that I want to group
 
     sorted_groups(filter_groups(df.groupby('group'), lambda x: x['feature1'].mean() > 0), lambda x: x['feature2'].mean())
 
-While this works, composing functions like this can make them become less and less readable (and makes it harder to write).  People familiar with lisp languages are familiar with this.
+While this works, composing functions like this can make them become less and less readable (and makes it harder to write).  This is a familiar issue with lisp languages.
 
-Fortunately, bamboo exposes a solution to this.
+Fortunately, bamboo exposes a solution to this.  Bamboo uses subclasses of common Pandas classes that have many of bamboo's helper functions available as methods.  One can create these classes by wrapping a Pandas object with the 'wrap' function:
 
-    bamboo.BambooObjects.BambooGroupBy(df.groupby('group')) \
+    from bamboo import wrap
+
+    wrap(df) \
+        .groupby('group') \
         .filter_groups(lambda x: x['feature1'].mean() > 0) \
         .sorted_groups(lambda x: x['feature2'].mean())
- 
- Notice that the result of each transformation is automatically passed to the next transformation.  This allows one to do more complicated transformations in succession
- 
-    from bamboo.bamboo import wrap
+
+ Notice that the result of each transformation is automatically passed to the next transformation.  This allows one to do more complicated transformations by chaining methods in succession:
+
 
     wrap(df).groupby('group') \
         .filter_groups(lambda x: x['group'].mean() > 0) \
@@ -64,5 +66,5 @@ Fortunately, bamboo exposes a solution to this.
         .map_groups(lambda x: x['feature1'].mean()) \
         .sum() \
         .hist()
-    
-Let's describe what's going here for the sake of completeness.  We start with a normal dataframe and group it by the 'group' column.  This turns it into a DataFrameGroupBy.  We then wrap this in a BambooGroupBy so that we can run a chain of transformations on it.  We start with a filter that requires that all remaining groups have a mean of their group column greater than 0.  Next, we sort the groups, ordering them by the mean of their 'feature2' column.  Then, we map a function over each row in each group, taking the mean of 'feature2'.  This turns the underlying object from a multi-column data frame into a data frame of only one column (the result of our mapping function).  Finally, we take the sum of that value within each group.  We end by making a histogram of the resulting object, which has a single value for each group.
+
+Let's describe what's going here for the sake of completeness.  We start by taking a normal Pandas DataFrame and convert it into a BambooDataFrame using 'wrap'.  This allows us to do in line processing on it.  We group it by the 'group' column, turning it into a DataFrameGroupBy.  Next, we apply a filter that requires that all remaining groups have a mean of their group column greater than 0.  We then sort the groups, ordering them by the mean of their 'feature2' column.  Then, we map a function over each row in each group, taking the mean of 'feature2'.  This turns the underlying object from a multi-column data frame into a data frame of only one column (the result of our mapping function).  Finally, we take the sum of that value within each group.  We end by making a histogram of the resulting object, which has a single value for each group.

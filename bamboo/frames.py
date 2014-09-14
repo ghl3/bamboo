@@ -67,7 +67,6 @@ def take(df, var, exclude=None):
     return (df[var], df[rest])
 
 
-
 def sort_rows(df, key=None):
     """
     Sort a dataframe's rows.
@@ -83,6 +82,7 @@ def sort_rows(df, key=None):
     vals = df.apply(key, axis=1)
     vals.sort()
     return df.ix[vals.index]
+
 
 def sort_columns(df, key=None, by_name=False):
     """
@@ -277,6 +277,7 @@ def boxplot(df, x, y, bins=None):
         boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False, return_type='dict')
 
 
+# TODO: Use python single dispatch (pep 443)
 def scatter(df, x, y, **kwargs):
     """
     Takes a grouped data frame and draws a scatter
