@@ -31,14 +31,19 @@ def _wrap_with_bamboo(obj):
 
 def _create_bamboo_wrapper(obj, func):
     def callable(*args, **kwargs):
-        print "Calling with args %s" % str(args)
-        if ismethod(func):
-            res = func()#instancemetho
-        else:
-            res = func(obj, *args, **kwargs)
+        print "Calling with %s args and %s kwargs" % (len(args), len(kwargs))
+        res = func(obj, *args, **kwargs)
         ret =  _wrap_with_bamboo(res)
         return ret
     return callable
+
+
+def _wrap_instance_method(method):
+    def wrapped_method(*args, **kwargs):
+        res = method.__call__(*args, **kwargs)
+        ret =  _wrap_with_bamboo(res)
+        return ret
+    return wrapped_method
 
 
 class BambooDataFrame(pandas.DataFrame):
@@ -114,7 +119,8 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
         if ismethod(val):
         #if type(val)=='instancemethod':
             print "Returning instancemethod"
-            return _create_bamboo_wrapper(self, val)
+            #return _create_bamboo_wrapper(self, val)
+            return _wrap_instance_method(val)
         else:
             return val
 
