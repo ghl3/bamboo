@@ -39,6 +39,12 @@ The return value is a DataFrameGroupBy with only two of the three groups remaini
 
 A common practice is to create overlapping plots of data broken up by a class.  This is easy with bamboo.
 
+        hist(df.groupby('group').feature1,
+            ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
+
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/image1.png)
+
+
     hist(df.groupby('group')['feature1'])
 
 
@@ -69,16 +75,7 @@ Fortunately, bamboo exposes a solution to this.  Bamboo uses subclasses of commo
 Let's describe what's going here for the sake of completeness.  We start by taking a normal Pandas DataFrame and convert it into a BambooDataFrame using 'wrap'.  This allows us to do in line processing on it.  We group it by the 'group' column, turning it into a DataFrameGroupBy.  Next, we apply a filter that requires that all remaining groups have a mean of their group column greater than 0.  We then sort the groups, ordering them by the mean of their 'feature2' column.  Then, we map a function over each row in each group, taking the mean of 'feature2'.  This turns the underlying object from a multi-column data frame into a data frame of only one column (the result of our mapping function).  Finally, we take the sum of that value within each group.  We end by making a histogram of the resulting object, which has a single value for each group.
 
 
-Bamboo also makes it easy to plot transformed data.  A common desire in data analysis is to compare the distribution of features across different categories.
-
-
-    wrap(df) \
-        .groupby('group') \
-        .feature1 \
-        .hist(ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
-
-![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/image1.png)
-
+Bringing this all together, Bamboo makes it easy to manipulate and plot data:
 
     wrap(df) \
         .groupby('group') \

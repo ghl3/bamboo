@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from bamboo import wrap
-
+from bamboo.groups import hist
 
 def create_df():
     group = [0, 0,
@@ -31,12 +31,9 @@ def main():
     df = create_df()
 
     fig = plt.figure(figsize=(12,8))
-    wrap(df) \
-        .groupby('group') \
-        .feature1 \
-        .hist(ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
+    hist(df.groupby('group').feature1,
+         ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
     fig.savefig('image1.png')
-
 
     fig = plt.figure(figsize=(12,8))
     wrap(df) \
