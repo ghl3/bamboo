@@ -6,16 +6,18 @@ from bamboo.core import wrap
 import numpy as np
 
 
+
 def test_wrap():
 
     df = create_test_df_v2()
 
-    return wrap(df).groupby('group') \
+    wrap(df) \
+        .groupby('group') \
         .filter_groups(lambda x: x['group'].mean() > 0) \
         .sorted_groups(lambda x: x['feature2'].mean()) \
-        .map_groups(lambda x: x['feature1'].mean()) \
+        .map_groups(lambda x: x['feature1'].mean(), name='mean') \
         .sum() \
-        .hist()
+        .hist(ax=plt.gca())
 
 
 def test_filter_groups():
@@ -74,3 +76,5 @@ def test_apply_groups():
         .apply_groups(thing, lambda x: x.feature1 - x.feature2)\
         .mean()\
         .scatter('thing', '<lambda>_1')
+
+

@@ -5,10 +5,10 @@ from pandas.core.groupby import GroupBy
 
 from inspect import getmembers, isfunction, ismethod
 
-import bamboo, groups, frames, plotting
+import core, groups, frames, plotting
 
 
-_bamboo_methods = {name:func  for name, func in getmembers(bamboo) if isfunction(func)}
+_bamboo_methods = {name:func  for name, func in getmembers(core) if isfunction(func)}
 _frames_methods = {name:func  for name, func in getmembers(frames) if isfunction(func)}
 _groups_methods = {name:func  for name, func in getmembers(groups) if isfunction(func)}
 _plot_methods = {} #{name:func  for name, func in getmembers(plotting) if isfunction(func)}

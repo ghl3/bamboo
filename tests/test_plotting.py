@@ -30,3 +30,5 @@ def test_hist_df():
 
 def test_hist_var():
     bamboo.groups.hist(df.groupby('group'), 'feature1')
+
+

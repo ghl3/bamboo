@@ -6,10 +6,8 @@ import pandas as pd
 from bamboo import plotting
 from helpers import combine_data_frames
 
-
 from types import *
 import inspect
-
 
 import matplotlib.pyplot as plt
 from math import floor, ceil
@@ -77,7 +75,7 @@ def map_groups(dfgb, func, name=None):
         name = func.__name__
 
     transformed = dfgb.obj.apply(func, axis=1, reduce=False)
-    return pd.DataFrame({name: transformed}).groupby(dfgb.grouper)
+    return pd.DataFrame({name: transformed}).groupby(dfgb.grouper)[name]
 
 
 def take_groups(dfgb, n):
