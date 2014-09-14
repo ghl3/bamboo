@@ -1,6 +1,8 @@
 
 from collections import OrderedDict
 
+from singledispatch import singledispatch
+
 import pandas as pd
 
 from bamboo import plotting
@@ -11,6 +13,9 @@ import inspect
 
 import matplotlib.pyplot as plt
 from math import floor, ceil
+
+from pandas.core.groupby import DataFrameGroupBy
+from pandas.core.groupby import SeriesGroupBy
 
 
 """
@@ -121,34 +126,34 @@ def apply_groups(dfgb, *args, **kwargs):
     return pd.DataFrame(res).groupby(dfgb.grouper)
 
 
-
-
-def hist(dfgb, var=None, *args, **kwargs):
+@singledispatch
+def hist(dfgb, *args, **kwargs):
     """
     Takes a data frame (grouped by a variable)
     and plots histograms of the variable 'var'
     for each of the groups.
     """
+    pass
 
-    if isinstance(dfgb, pd.core.groupby.SeriesGroupBy):
-        plotting._series_hist(dfgb, *args, **kwargs)
 
-    elif isinstance(dfgb, pd.core.groupby.DataFrameGroupBy):
-        if var is not None:
-            plotting._series_hist(dfgb[var], *args, **kwargs)
-        else:
-            for (var, series) in dfgb._iterate_column_groupbys():
-                plt.figure()
-                try:
-                    plotting._series_hist(series, *args, **kwargs)
-                    plt.xlabel(var)
-                except TypeError as e:
-                    print "Failed to plot %s" % var
-                    print e
-                finally:
-                    pass
+@hist.register(SeriesGroupBy)
+def _(sgb, *args, **kwargs):
+    plotting._series_hist(dfgb, *args, **kwargs)
+
+
+@hist.register(DataFrameGroupBy)
+def _(dfgb, var=None, *args, **kwargs):
+    if var is not None:
+        plotting._series_hist(dfgb[var], *args, **kwargs)
     else:
-        pass
+        for (var, series) in dfgb._iterate_column_groupbys():
+            plt.figure()
+            try:
+                plotting._series_hist(series, *args, **kwargs)
+                plt.xlabel(var)
+            except TypeError as e:
+                print "Failed to plot %s" % var
+                print e
 
 
 def hist_functions(dfgb, functions, cols=2, **kwargs):
