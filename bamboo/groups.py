@@ -138,7 +138,7 @@ def hist(dfgb, *args, **kwargs):
 
 @hist.register(SeriesGroupBy)
 def _(sgb, *args, **kwargs):
-    plotting._series_hist(dfgb, *args, **kwargs)
+    plotting._series_hist(sgb, *args, **kwargs)
 
 
 @hist.register(DataFrameGroupBy)

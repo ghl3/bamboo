@@ -1,4 +1,6 @@
 
+import matplotlib.pyplot as plt
+
 
 from helpers import *
 from bamboo.core import wrap
