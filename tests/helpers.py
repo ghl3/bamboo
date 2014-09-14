@@ -68,5 +68,4 @@ def create_test_df_v2():
     df = pandas.DataFrame({'group':group,
                            'feature1':feature1,
                            'feature2':feature2})
-
     return df

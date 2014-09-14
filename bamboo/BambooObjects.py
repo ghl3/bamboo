@@ -156,7 +156,7 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
 
 
     def __getattribute__(self, *args, **kwargs):
-        val = super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs)
+        val = super(BambooSeriesGroupBy, self).__getattribute__(*args, **kwargs)
         if ismethod(val):
             # If we're getting a method, we wrap the result
             # as a bamboo object
