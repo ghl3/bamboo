@@ -31,7 +31,6 @@ def _wrap_with_bamboo(obj):
 
 def _create_bamboo_wrapper(obj, func):
     def callable(*args, **kwargs):
-        print "Calling with %s args and %s kwargs" % (len(args), len(kwargs))
         res = func(obj, *args, **kwargs)
         ret =  _wrap_with_bamboo(res)
         return ret
@@ -54,14 +53,15 @@ class BambooDataFrame(pandas.DataFrame):
     def groupby(self, *args, **kwargs):
         return _wrap_with_bamboo(super(BambooDataFrame, self).groupby(*args, **kwargs))
 
-    def __getattribute__(self, *args, **kwargs):
-        #print "getattribute: %s" % args
-        val = super(BambooDataFrame, self).__getattribute__(*args, **kwargs)
-        #print "Got val for arg %s: %s" % (args, type(val))
-        ret = _wrap_with_bamboo(val)
-        #print "Wrapped for arg %s: %s" % (args, type(ret))
-        return ret
 
+    def __getattribute__(self, *args, **kwargs):
+        val = super(BambooDataFrame, self).__getattribute__(*args, **kwargs)
+        if ismethod(val):
+            # If we're getting a method, we wrap the result
+            # as a bamboo object
+            return _wrap_instance_method(val)
+        else:
+            return val
 
 
     def __getattr__(self, *args, **kwargs):
@@ -79,7 +79,6 @@ class BambooDataFrame(pandas.DataFrame):
 
         res = super(BambooDataFrame, self).__getattr__(*args, **kwargs)
         return _wrap_with_bamboo(res)
-        #return _create_bamboo_wrapper(self, super(BambooDataFrame, self).__getattribute__(*args, **kwargs))
 
 
 class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
@@ -107,39 +106,16 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
 
 
     def __getattribute__(self, *args, **kwargs):
-
-        if args[0]=='mean':
-            print "MEAN"
-
-        #print "getattribute: %s" % args
         val = super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs)
-
-        print "Type: %s" % type(val)
-
         if ismethod(val):
-        #if type(val)=='instancemethod':
-            print "Returning instancemethod"
-            #return _create_bamboo_wrapper(self, val)
+            # If we're getting a method, we wrap the result
+            # as a bamboo object
             return _wrap_instance_method(val)
         else:
             return val
 
-        if args[0]=='mean':
-            print "Got val for arg %s: %s" % (args, type(val))
-            print "of type: %s" % type(val.__call__())
-
-        print type(val)
-        #ret = _create_bamboo_wrapper(self, val)
-        ret = _wrap_with_bamboo(val)
-        #if args[0]=='mean':
-        #    print "Wrapped for arg %s: %s" % (args, type(ret))
-        #    print "to type: %s" % type(ret.__call__())
-        return ret
-
 
     def __getattr__(self, *args, **kwargs):
-
-        print "getattr: %s" % args
 
         name, pargs = args[0], args[1:]
 
@@ -150,13 +126,11 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
             return _create_bamboo_wrapper(self, _plot_methods[name])
 
         if name in _groups_methods:
-            print "Using groups methods for: %s" % name
             return _create_bamboo_wrapper(self, _groups_methods[name])
             return ret_val
 
         res = super(BambooDataFrameGroupBy, self).__getattr__(*args, **kwargs)
         return _wrap_with_bamboo(res)
-        #return _create_bamboo_wrapper(self, res)
 
 
 class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
@@ -180,6 +154,17 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
     def head(self, *args, **kwargs):
         return bamboo.head(self, *args, **kwargs)
 
+
+    def __getattribute__(self, *args, **kwargs):
+        val = super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs)
+        if ismethod(val):
+            # If we're getting a method, we wrap the result
+            # as a bamboo object
+            return _wrap_instance_method(val)
+        else:
+            return val
+
+
     def __getattr__(self, *args, **kwargs):
 
         name, pargs = args[0], args[1:]
@@ -195,5 +180,3 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
 
         res = super(BambooSeriesGroupBy, self).__getattr__(*args, **kwargs)
         return _wrap_with_bamboo(res)
-        #return _create_bamboo_wrapper(self, super(BambooSeriesGroupBy, self).__getattribute__(*args, **kwargs))
-
