@@ -3,7 +3,9 @@ from collections import OrderedDict
 
 import pandas as pd
 
+from bamboo import plotting
 from helpers import combine_data_frames
+
 
 from types import *
 import inspect
@@ -131,16 +133,16 @@ def hist(dfgb, var=None, *args, **kwargs):
     """
 
     if isinstance(dfgb, pd.core.groupby.SeriesGroupBy):
-        _series_hist(dfgb, *args, **kwargs)
+        plotting._series_hist(dfgb, *args, **kwargs)
 
     elif isinstance(dfgb, pd.core.groupby.DataFrameGroupBy):
         if var is not None:
-            _series_hist(dfgb[var], *args, **kwargs)
+            plotting._series_hist(dfgb[var], *args, **kwargs)
         else:
             for (var, series) in dfgb._iterate_column_groupbys():
                 plt.figure()
                 try:
-                    _series_hist(series, *args, **kwargs)
+                    plotting._series_hist(series, *args, **kwargs)
                     plt.xlabel(var)
                 except TypeError as e:
                     print "Failed to plot %s" % var
@@ -218,4 +220,4 @@ def stacked_counts_plot(dfgb, category, ratio=False, **kwargs):
 
 
 def save_grouped_hists(dfgb, output_file, title=None, *args, **kwargs):
-    _save_plots(dfgb, _series_hist, output_file, title, *args, **kwargs)
+    _save_plots(dfgb, plotting._series_hist, output_file, title, *args, **kwargs)

@@ -3,7 +3,7 @@ import pandas
 
 from pandas.util.testing import assert_frame_equal, assert_panelnd_equal
 
-from bamboo.bamboo import head
+from bamboo.core import head
 
 def assert_equals(obj1, obj2):
 

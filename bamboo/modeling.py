@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
+from bamboo import groups
+
 from sklearn.metrics import classification_report
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_curve
@@ -20,7 +22,7 @@ from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import roc_curve, auc
 
 from random import sample
-from plotting import hist
+#from plotting import hist
 
 from helpers import NUMERIC_TYPES
 
@@ -56,7 +58,7 @@ def plot_precision_recall_curve(y_true, y_scores):
 def plot_distribution(clf, features, targets, fit_params=None, **kwargs):
     score_groups = get_scores(clf, features, targets,
                               StratifiedKFold(targets, n_folds=2), fit_params)
-    hist(score_groups[0].groupby('targets'), var='predict_proba_1', **kwargs)
+    groups.hist(score_groups[0].groupby('targets'), var='predict_proba_1', **kwargs)
 
 
 def balance_dataset(grouped, shrink=True, random=False):

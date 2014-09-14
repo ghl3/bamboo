@@ -14,7 +14,7 @@ from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
 
 from frames import group_by_binning
-from groups import map_groups
+#from groups import map_groups
 from helpers import NUMERIC_TYPES
 
 

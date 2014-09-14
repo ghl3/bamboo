@@ -1,7 +1,7 @@
 
 import pandas
 from nose.tools import *
-from bamboo.bamboo import *
+from bamboo.core import *
 from bamboo.helpers import *
 
 from pandas.util.testing import assert_frame_equal

@@ -5,6 +5,7 @@ import bamboo.modeling
 import sklearn.ensemble
 from sklearn import cross_validation
 
+
 group = [0, 0, 0, 0,
          1, 1,
          0, 1]

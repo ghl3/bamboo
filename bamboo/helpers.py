@@ -1,6 +1,12 @@
 
-
 import pandas as pd
+
+
+NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
+                 'int16', 'int32', 'int64', 'uint8',
+                 'uint16', 'uint32', 'uint64', 'float_',
+                 'float16', 'float32', 'float64')
+
 
 def combine_data_frames(frames):
     """
@@ -16,9 +22,4 @@ def combine_data_frames(frames):
         first = frames[0]
         return first.append(list(frames[1:]))
 
-
-NUMERIC_TYPES = ('bool_', 'int_', 'intc', 'intp', 'int8',
-                 'int16', 'int32', 'int64', 'uint8',
-                 'uint16', 'uint32', 'uint64', 'float_',
-                 'float16', 'float32', 'float64')
 

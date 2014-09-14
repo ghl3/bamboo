@@ -1,7 +1,7 @@
 
 
 from helpers import *
-from bamboo.bamboo import wrap
+from bamboo.core import wrap
 
 
 def test_wrap():
