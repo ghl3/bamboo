@@ -43,16 +43,6 @@ def test_take_groups():
     assert_equals(filtered, should_be)
 
 
-# def test_sort():
-#     """
-#     Sort the order of the groups
-#     by the size of the group
-#     """
-#     dfgb = create_test_df().groupby('group')
-
-#     sorted_groups(dfgb, lambda x: len(x))
-
-
 def test_sort_v2():
     """
     Sort the order of the groups
@@ -72,3 +62,33 @@ def test_sort_v2():
 
     group_order = [key for key, group in dfgb_sorted]
     eq_(group_order, [3, 0, 4, 1])
+
+
+def test_hist_functions():
+
+    dfgb = create_test_df_v2().groupby('group')
+
+    hist_functions(dfgb, lambda x: x.feature1+x.feature2, lambda x: x.feature1-x.feature2)
+
+
+def test_scatter():
+
+    dfgb = create_test_df_v2().groupby('group')
+
+    scatter(dfgb, 'feature1', 'feature2')
+
+
+def test_stacked_counts_plot():
+
+    dfgb = create_test_df_v2().groupby('group')
+
+    stacked_counts_plot(dfgb, 'feature1')
+
+    stacked_counts_plot(dfgb, 'feature1', ratio=True)
+
+
+def test_pivot_groups():
+
+    dfgb = create_test_df_v2().groupby(['group', 'feature1'])
+
+    pivot_groups(dfgb, lambda x: x.feature2)

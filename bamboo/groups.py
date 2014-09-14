@@ -99,12 +99,17 @@ def take_groups(dfgb, n):
     return combine_data_frames(return_groups).groupby(dfgb.keys)
 
 
-def pivot_groups(dfgb, **kwargs):
+def pivot_groups(dfgb, func, **kwargs):
     """
     Pivot a DataFrameGroupBy.
     Takes all the normal keyword args of a pivot
     """
-    return dfgb.reset_index().pivot(**kwargs)
+
+    assert(dfgb.first().index.nlevels==2)
+
+    x, y = dfgb.first().index.names
+
+    return dfgb.apply(func).reset_index().pivot(index=x, columns=y, **kwargs)
 
 
 def apply_groups(dfgb, *args, **kwargs):
@@ -156,7 +161,7 @@ def _(dfgb, var=None, *args, **kwargs):
                 print e
 
 
-def hist_functions(dfgb, functions, cols=2, **kwargs):
+def hist_functions(dfgb, *args, **kwargs):
     """
     Take a DataFrameGroupBy and a list of functions and make a
     grid of plots showing a histogram of the values of each
@@ -166,7 +171,14 @@ def hist_functions(dfgb, functions, cols=2, **kwargs):
     Useful for exploring new features in classification
     """
 
-    rows = math.ceil(len(functions) / cols)
+    if 'cols' in kwargs:
+        cols = kwargs['cols']
+    else:
+        cols = 2
+
+    functions = args
+
+    rows = ceil(len(functions) / cols)
 
     for i, function in enumerate(functions):
         plt.subplot(rows, cols, i+1)
