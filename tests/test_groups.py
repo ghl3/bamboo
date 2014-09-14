@@ -64,6 +64,7 @@ def test_sort_v2():
     eq_(group_order, [3, 0, 4, 1])
 
 
+@plotting_test
 def test_hist_functions():
 
     dfgb = create_test_df_v2().groupby('group')

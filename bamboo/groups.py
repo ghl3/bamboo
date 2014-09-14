@@ -99,17 +99,20 @@ def take_groups(dfgb, n):
     return combine_data_frames(return_groups).groupby(dfgb.keys)
 
 
-def pivot_groups(dfgb, func, **kwargs):
+def pivot_groups(mdfgb, func, **kwargs):
     """
-    Pivot a DataFrameGroupBy.
-    Takes all the normal keyword args of a pivot
+    Pivot a DataFrameGroupBy that is grouped by
+    exactly 2 gruped (hierarical index)
+    and return a new DataFrame that is pivoted by
+    those two groups and whose cell value is the
+    value of the given function.
     """
 
-    assert(dfgb.first().index.nlevels==2)
+    assert(mdfgb.first().index.nlevels==2)
 
-    x, y = dfgb.first().index.names
+    x, y = mdfgb.first().index.names
 
-    return dfgb.apply(func).reset_index().pivot(index=x, columns=y, **kwargs)
+    return mdfgb.apply(func).reset_index().pivot(index=x, columns=y, **kwargs)
 
 
 def apply_groups(dfgb, *args, **kwargs):

@@ -5,6 +5,8 @@ from pandas.util.testing import assert_frame_equal, assert_panelnd_equal
 
 from bamboo.core import head
 
+from functools import wraps
+
 def assert_equals(obj1, obj2):
 
     print "Object of type {}:\n {}\nShould equal Object of type {}:\n{}\n".format(
@@ -69,3 +71,16 @@ def create_test_df_v2():
                            'feature1':feature1,
                            'feature2':feature2})
     return df
+
+
+
+def plotting_test(test):
+
+    @wraps(test)
+    def test_wrapper(name):
+        plt.clf()
+        res = test()
+        plt.safefig(test.__name__+".png")
+        return res
+
+    return func_wrapper
