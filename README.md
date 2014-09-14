@@ -64,7 +64,26 @@ Fortunately, bamboo exposes a solution to this.  Bamboo uses subclasses of commo
         .filter_groups(lambda x: x['group'].mean() > 0) \
         .sorted_groups(lambda x: x['feature2'].mean()) \
         .map_groups(lambda x: x['feature1'].mean()) \
-        .sum() \
-        .hist()
+        .sum()
 
 Let's describe what's going here for the sake of completeness.  We start by taking a normal Pandas DataFrame and convert it into a BambooDataFrame using 'wrap'.  This allows us to do in line processing on it.  We group it by the 'group' column, turning it into a DataFrameGroupBy.  Next, we apply a filter that requires that all remaining groups have a mean of their group column greater than 0.  We then sort the groups, ordering them by the mean of their 'feature2' column.  Then, we map a function over each row in each group, taking the mean of 'feature2'.  This turns the underlying object from a multi-column data frame into a data frame of only one column (the result of our mapping function).  Finally, we take the sum of that value within each group.  We end by making a histogram of the resulting object, which has a single value for each group.
+
+
+Bamboo also makes it easy to plot transformed data.  A common desire in data analysis is to compare the distribution of features across different categories.
+
+
+    wrap(df) \
+        .groupby('group') \
+        .feature1 \
+        .hist(ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
+
+![alt tag](https://raw.github.com/ghl3/bamboo/images/image1.png)
+
+
+    wrap(df) \
+        .groupby('group') \
+        .map_groups(lambda x: x.feature1 + x.feature1, name='mean') \
+        .hist(ax=plt.gca(), bins=np.arange(-100, 100, 10), alpha=0.5)
+
+
+![alt tag](https://raw.github.com/ghl3/bamboo/images/image2.png)
