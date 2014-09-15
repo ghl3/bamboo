@@ -25,4 +25,6 @@ setup(
     packages=["bamboo"],
     license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
     description="Data manipulation for python using Pandas",
+    url = 'https://github.com/ghl3/bamboo',
+    download_url = 'https://github.com/ghl3/bamboo/tarball/0.1',
 )
