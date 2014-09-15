@@ -3,6 +3,7 @@ cover
 build
 dist
 bamboo.egg-info
+pandas_bamboo.egg-info
 *.pyc
 .ipynb*
 *.ipynb

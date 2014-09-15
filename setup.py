@@ -18,7 +18,7 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 setup(
-    name="bamboo",
+    name="pandas-bamboo",
     packages=["bamboo"],
     version='0.1',
     author="George Herbert Lewis",
