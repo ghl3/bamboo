@@ -19,12 +19,15 @@ if sys.argv[-1] == "publish":
 
 setup(
     name="bamboo",
+    packages=["bamboo"],
     version='0.1',
     author="George Herbert Lewis",
     author_email="ghl227@gmail.com",
-    packages=["bamboo"],
     license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
     description="Data manipulation for python using Pandas",
     url = 'https://github.com/ghl3/bamboo',
     download_url = 'https://github.com/ghl3/bamboo/tarball/0.1',
+    install_requires=[
+        'pandas', 'numpy', 'matplotlib'
+    ],
 )
