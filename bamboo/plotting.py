@@ -14,9 +14,10 @@ from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
 
 from frames import group_by_binning
-#from groups import map_groups
+
 from helpers import NUMERIC_TYPES
 
+import itertools
 
 def _draw_stacked_plot(dfgb, **kwargs):
     """
@@ -86,7 +87,7 @@ def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, *a
     plt.legend(loc='best', fancybox=True)
 
 
-def _series_hist_float(dfgb, ax=plt.gca(), autobin=False, normed=False, normalize=False,
+def _series_hist_float(dfgb, ax=None, autobin=False, normed=False, normalize=False,
                        stacked=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
@@ -94,10 +95,13 @@ def _series_hist_float(dfgb, ax=plt.gca(), autobin=False, normed=False, normaliz
     for each of the groups.
     """
 
+    if ax==None:
+        ax = plt.gca()
+
     if autobin and 'bins' not in kwargs:
         kwargs['bins'] = _get_variable_binning(dfgb.obj)
 
-    color_cycle = ax._get_lines.color_cycle
+    color_cycle = itertools.cycle(ax._get_lines.color_cycle)
 
     for (color, (key, srs)) in zip(color_cycle, dfgb):
 
@@ -118,6 +122,9 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, *args, **kwargs):
     and plots histograms of the variable 'var'
     for each of the groups.
     """
+
+    if ax==None:
+        ax = plt.gca()
 
     color_cycle = ax._get_lines.color_cycle
 
@@ -150,6 +157,8 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     (or 2nd) percentile as the bin edge. Otherwise we use the actual extremum.
     """
 
+    var = var[np.isfinite(var)] 
+
     var_min = min(var)
     var_max = max(var)
 
@@ -177,4 +186,5 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
         var_min = p_02_exp
 
     bins = np.arange(nbins+1)/nbins * (var_max - var_min) + var_min
+
     return bins
