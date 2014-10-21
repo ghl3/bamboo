@@ -128,6 +128,8 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, *args, **kwargs):
 
     color_cycle = ax._get_lines.color_cycle
 
+    vals = set(dfgb.obj.values)
+
     for (color, (key, srs)) in zip(color_cycle, dfgb):
 
         if 'label' in kwargs.keys():
@@ -138,7 +140,7 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, *args, **kwargs):
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        value_counts = srs.value_counts(normalize=normalize).sort_index()
+        value_counts = srs.value_counts(normalize=normalize)[vals]
         value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
 
 
