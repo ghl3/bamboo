@@ -128,7 +128,7 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, *args, **kwargs):
 
     color_cycle = ax._get_lines.color_cycle
 
-    vals = set(dfgb.obj.values)
+    vals = [val for val in set(dfgb.obj.values) if val is not None]
 
     for (color, (key, srs)) in zip(color_cycle, dfgb):
 
