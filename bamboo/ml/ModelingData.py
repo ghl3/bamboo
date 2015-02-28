@@ -1,4 +1,6 @@
+from __future__ import division
 
+import numpy as np
 
 from sklearn.preprocessing import balance_weights
 from sklearn.cross_validation import ShuffleSplit
@@ -13,9 +15,10 @@ class ModelingData():
     boilerplate for ML code.
     """
 
-    def __init__(self, features, targets):
+    def __init__(self, features, targets, weights=None):
         self.features = features
         self.targets = targets
+        self.weights = weights
 
 
     @staticmethod
@@ -45,6 +48,14 @@ class ModelingData():
         return self.features.shape
 
 
+    def num_classes(self):
+        return len(self.targets.value_counts())
+
+
+    def get_grouped_targets(self):
+        return self.targets.groupby(self.targets)
+
+    
     def is_orthogonal(self, other):
         indices = set(self.features.index)
         return not any(idx in indices for idx in other.features.index)
@@ -92,18 +103,26 @@ class ModelingData():
         """
 
         group_size = self.targets.value_counts().min()
-
         grouped = self.features.groupby(self.targets)
-
-        print group_size, grouped
-        
         indices = []
 
         for name, group in grouped:
             indices.extend(group[:group_size].index)
 
-        print indices
-            
+        return ModelingData(self.features.ix[indices], self.targets.ix[indices])
+
+
+    def _balance_by_sample_with_replace(self, size=None, exact=False):
+        if size is None:
+            size = len(self)
+
+        approx_num_per_class = size / self.num_classes()
+
+        indices = []
+
+        for target, group in self.get_grouped_targets():
+            indices.extend(np.random.choice(group.index.values, approx_num_per_class, replace=True))
+
         return ModelingData(self.features.ix[indices], self.targets.ix[indices])
 
 

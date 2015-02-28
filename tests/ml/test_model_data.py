@@ -1,4 +1,6 @@
 
+import numpy as np
+
 import pandas
 from nose.tools import *
 from bamboo.core import *
@@ -40,14 +42,14 @@ def test_split():
     eq_(test.shape(), (3,3))
 
     assert(train.is_orthogonal(test))
-    
+
 
 def test_balance_truncation():
 
     data = bamboo.ml.ModelingData.from_dataframe(df, target='group')
 
     eq_(len(data), 12)
-    
+
     value_counts = data.targets.value_counts()
     eq_(value_counts[0], 7)
     eq_(value_counts[1], 5)
@@ -60,6 +62,27 @@ def test_balance_truncation():
     value_counts = balanced.targets.value_counts()
     eq_(value_counts[0], 5)
     eq_(value_counts[1], 5)
+
+
+def test_balance_sample():
+
+    data = bamboo.ml.ModelingData.from_dataframe(df, target='group')
+
+    eq_(len(data), 12)
+
+    value_counts = data.targets.value_counts()
+    eq_(value_counts[0], 7)
+    eq_(value_counts[1], 5)
+
+    # Now, balance the data
+    np.random.seed(42)
+    balanced = data._balance_by_sample_with_replace(size=20)
+
+    eq_(len(balanced), 20)
+
+    value_counts = balanced.targets.value_counts()
+    eq_(value_counts[0], 10)
+    eq_(value_counts[1], 10)
 
 
 
