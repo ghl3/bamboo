@@ -1,6 +1,7 @@
 
 
 from sklearn.preprocessing import balance_weights
+from sklearn.cross_validation import ShuffleSplit
 
 
 class ModelingData():
@@ -30,10 +31,24 @@ class ModelingData():
 
         return ModelingData(feature_data, target_data)
 
+
     def __len__(self):
         assert(len(self.features)==len(self.targets))
         return len(self.targets)
-    
+
+
+    def __str__(self):
+        return "ModelingData({})".format(self.features.shape)
+
+
+    def shape(self):
+        return self.features.shape
+
+
+    def is_orthogonal(self, other):
+        indices = set(self.features.index)
+        return not any(idx in indices for idx in other.features.index)
+
 
     def fit(self, clf, *args, **kwargs):
         return clf.fit(self.features, self.targets, *args, **kwargs)
@@ -60,13 +75,13 @@ class ModelingData():
 
         train, test = next(iter(cv))
 
-        X_train = self.features[train]
-        y_train = self.targets[train]
+        X_train = self.features.ix[train]
+        y_train = self.targets.ix[train]
 
-        X_test = self.features[test]
-        y_test = self.features[test]
+        X_test = self.features.ix[test]
+        y_test = self.features.ix[test]
 
-        return ModelingData(X_train, X_test), ModelingData(Y_train, Y_test)
+        return ModelingData(X_train, y_train), ModelingData(X_test, y_test)
 
 
     def _balance_by_truncation(self):
