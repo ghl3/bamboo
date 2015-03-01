@@ -163,8 +163,8 @@ class ModelingData():
 
 
     def hist(self, var_name, **kwargs):
-        grouped = self.features[var_name].groupby(self.targets
-)
+        grouped = self.features[var_name].groupby(self.targets)
+        return bamboo.plotting._series_hist(grouped, **kwargs)
 
 
     def hist_all(self, shape=None, binning_map=None, figsize=None, **kwargs):
@@ -247,11 +247,9 @@ class ModelingData():
 
 
     def plot_proba(self, clf, target, **kwargs):
-
         probabilities = self.predict_proba(clf)
         target_name = 'proba_{}'.format(target)
         reduced = probabilities[[target_name, 'target']]
-
         return bamboo.plotting._series_hist(reduced.groupby('target')[target_name], **kwargs)
 
 
@@ -309,15 +307,14 @@ class ModelingData():
         num_true_negatives = len(true_negatives)
         num_false_negatives = len(false_negatives)
 
-        precision = num_true_positives / num_positives if num_positives > 0 else 0.0
-        recall = num_true_positives / (num_true_positives + num_false_negatives) if num_true_positives + num_false_negatives > 0 else 0.0
+        precision = num_true_positives / (num_true_positives + num_false_positives) if num_true_positives+num_false_positives > 0 else 1.0
+        recall = num_true_positives / (num_true_positives + num_false_negatives) if num_true_positives + num_false_negatives > 0 else 1.0
 
         sensitivity = recall
         specificity = num_true_negatives / (num_false_positives + num_true_negatives) if num_false_positives + num_true_negatives > 0 else 1.0
 
         true_positive_rate = sensitivity
         false_positive_rate = (1.0 - specificity)
-
 
         accuracy = (num_true_positives + num_true_negatives) / num
         f1 = 2*num_true_positives / (2*num_true_positives + num_false_positives + num_false_negatives) if 2*num_true_positives + num_false_positives + num_false_negatives else 0.0
