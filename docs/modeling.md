@@ -19,11 +19,11 @@ Modeling Example
 	
 	# Plot a features
 	data.hist('feature1', alpha=0.5, bins=np.arange(-1.0,1.0,.1))
-	![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling1.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling1.png)
 
 	# One can also view all features at once
 	data.hist_all(figsize=(12,8), alpha=0.5, normed=True)
-	![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling2.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling2.png)
 	
 	# Let's create training and testing data and train a classifier
 	training, testing = data.train_test_split()
@@ -37,7 +37,7 @@ Modeling Example
 	
 	# And let's score the classifier on our testing set and view the score distributions by class
 	testing.plot_proba(clf, 0, bins=np.arange(0.0, 1.0, 0.1), alpha=0.5, normalize=True)
-	![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling3.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling3.png)
 	
 	
 	# Let's look deeper into the individual scores and some hypothetical performance data as a function of score threshold
@@ -75,11 +75,11 @@ Modeling Example
 	plt.xlim([0.0, 1.0])
 	plt.ylim([0.0, 1.0])
 	plt.savefig("images/modeling4.png")
-	![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling4.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling4.png)
 
 
 	summary.plot(x='precision', y='recall')
 	plt.xlim([0.0, 1.0])
 	plt.ylim([0.0, 1.0])
 	plt.savefig("images/modeling5.png")
-	![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling5.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/modeling5.png)
