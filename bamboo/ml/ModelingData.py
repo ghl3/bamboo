@@ -213,7 +213,6 @@ class ModelingData():
         return pd.DataFrame(scores)
 
 
-
     def _cross_validate_score(self, clf, fit=False, **kwargs):
         return cross_validation.cross_val-score(clf, self.features, self.targets, **kwargs)
 
@@ -226,7 +225,7 @@ class ModelingData():
         for that classifier
         """
         probas = self.predict_proba(clf)
-        threshold_summaries = [get_threshold_summary(probas, target, threshold) for threshold in thresholds]
+        threshold_summaries = [ModelingData.get_threshold_summary(probas, target, threshold) for threshold in thresholds]
         return pd.DataFrame(threshold_summaries)
 
 
@@ -289,20 +288,3 @@ class ModelingData():
                 'f1': f1,
                 'false_positive_rate': false_positive_rate,
                 'true_positive_rate': true_positive_rate}
-
-
-        # for x in np.arange(0.0, 1.0, 0.01):
-        #     thresholds.append(x)
-        #     reduced = score_summary[score_summary.score >= x]
-        #     approval = len(reduced) / len(score_summary)
-        #     if len(reduced) == 0:
-        #         repayment = 0.0
-        #     else:
-        #         repayment = reduced.target.sum() / len(reduced)
-        #         approvals.append(approval)
-        #         repayments.append(repayment)
-
-        # return pd.DataFrame({'threshold': thresholds,
-        #                      'approval': approvals,
-        #                      'repayment': repayments})
-
