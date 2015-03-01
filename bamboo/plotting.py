@@ -19,6 +19,7 @@ from helpers import NUMERIC_TYPES
 
 import itertools
 
+
 def _draw_stacked_plot(dfgb, **kwargs):
     """
     Draw a vertical bar plot of multiple series

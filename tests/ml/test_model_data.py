@@ -11,6 +11,8 @@ from pandas.util.testing import assert_frame_equal
 
 from numpy.random import RandomState
 
+from sklearn.linear_model import LogisticRegression
+
 group = [0, 0, 0, 0,
          1, 1, 1, 1,
          0, 0, 0, 1]
@@ -117,3 +119,18 @@ def test_numeric_features():
 
     eq_(numeric_data.shape(), (12,3))
     assert('feature3' not in numeric_data.features.columns)
+
+
+
+def test_scores():
+
+    clf = LogisticRegression()
+
+    data = bamboo.ml.ModelingData.from_dataframe(df, target='group')
+
+    data.fit(clf)
+
+    scores = data.predict_proba(clf)
+
+    eq_(scores[0], {'index': 0, 'proba_0': 0.64009602726273496, 'proba_1': 0.35990397273726504, 'target': 0})
+
