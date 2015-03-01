@@ -5,6 +5,7 @@ import pandas as pd
 
 from sklearn.preprocessing import balance_weights
 from sklearn.cross_validation import ShuffleSplit
+from sklearn import cross_validation
 
 from bamboo.helpers import NUMERIC_TYPES
 
@@ -210,3 +211,86 @@ class ModelingData():
             scores.append(res)
 
         return scores
+
+
+
+    def _cross_validate_score(self, clf, fit=False, **kwargs):
+        return cross_validation.cross_val-score(clf, self.features, self.targets, **kwargs)
+
+
+    @staticmethod
+    def get_threshold_summary(probability_summary, target, threshold=0.5, **kwargs):
+        """
+        Takes a probability summary, a target we're
+        trying to predict (that is represented in the
+        probability summary) and the threshold for
+        that probability and returns a summary
+
+        probabolity_summary = [{'proba_A': x, 'target': A}, {'proba_A': y, 'target': B}]
+        """
+
+        probability_label = "proba_{}".format(target)
+
+        probability_summary = pd.DataFrame(probability_summary)
+
+        positives = probability_summary[probability_summary[probability_label] >= threshold]
+        true_positives = positives[positives['target']==target]
+        false_positives = positives[positives['target']!=target]
+
+        negatives = probability_summary[probability_summary[probability_label] < threshold]
+        true_negatives = positives[positives['target'] != target]
+        false_negatives = positives[positives['target'] == target]
+
+        num = len(probability_summary)
+
+        num_positives = len(positives)
+        num_negatives = len(negatives)
+
+        num_true_positives = len(true_positives)
+        num_false_positives = len(false_positives)
+        num_true_negatives = len(true_negatives)
+        num_false_negatives = len(false_negatives)
+
+        false_positive_rate = num_true_positives / num
+        true_positive_rate = num_false_positives / num
+
+        precision = num_true_positives / num_positives
+        recall = num_true_positives / (num_true_positives + num_false_negatives)
+
+        sensitivity = recall
+        specificity = num_true_negatives / (num_false_positives + num_true_negatives) if num_false_positives + num_true_negatives > 0 else 1.0
+
+        accuracy = (num_true_positives + num_true_negatives) / num
+        f1 = 2*num_true_positives / (2*num_true_positives + num_false_positives + num_false_negatives)
+
+        return {'threshold': threshold,
+                'target': target,
+                'true_positives': num_true_positives,
+                'false_positives': num_false_positives,
+                'true_negatives': num_true_negatives,
+                'false_negatives': num_false_negatives,
+                'precision': precision,
+                'recall': recall,
+                'sensiticity': sensitivity,
+                'specificity': specificity,
+                'accuracy': accuracy,
+                'f1': f1,
+                'false_positive_rate': false_positive_rate,
+                'true_positive_rate': true_positive_rate}
+
+
+        # for x in np.arange(0.0, 1.0, 0.01):
+        #     thresholds.append(x)
+        #     reduced = score_summary[score_summary.score >= x]
+        #     approval = len(reduced) / len(score_summary)
+        #     if len(reduced) == 0:
+        #         repayment = 0.0
+        #     else:
+        #         repayment = reduced.target.sum() / len(reduced)
+        #         approvals.append(approval)
+        #         repayments.append(repayment)
+
+        # return pd.DataFrame({'threshold': thresholds,
+        #                      'approval': approvals,
+        #                      'repayment': repayments})
+
