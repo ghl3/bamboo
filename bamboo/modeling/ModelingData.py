@@ -1,7 +1,10 @@
 from __future__ import division
 
+import math
+
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from sklearn.preprocessing import balance_weights
 from sklearn.cross_validation import ShuffleSplit
@@ -33,7 +36,7 @@ class ModelingData():
 
         if features is None:
             features = [feature for feature in df.columns
-                        if features != target]
+                        if feature != target]
 
         feature_data = df[features]
 
@@ -104,7 +107,7 @@ class ModelingData():
         y_train = self.targets.ix[train]
 
         X_test = self.features.ix[test]
-        y_test = self.features.ix[test]
+        y_test = self.targets.ix[test]
 
         return ModelingData(X_train, y_train), ModelingData(X_test, y_test)
 
@@ -160,8 +163,28 @@ class ModelingData():
 
 
     def hist(self, var_name, **kwargs):
-        grouped = self.features[var_name].groupby(self.targets)
-        return bamboo.plotting._series_hist(grouped, **kwargs)
+        grouped = self.features[var_name].groupby(self.targets
+)
+
+
+    def hist_all(self, shape=None, binning_map=None, figsize=None, **kwargs):
+
+        fig = plt.figure(figsize=figsize)
+
+        if shape is None:
+            x = 3
+            y = math.ceil(len(self.features.columns) / x)
+        else:
+            (x, y) = shape
+
+        for i, feature in enumerate(self.features.columns):
+            plt.subplot(x, y, i+1)
+            if binning_map and feature in binning_map:
+                self.hist(feature, bins=bins, **kwargs)
+            else:
+                self.hist(feature, autobin=True, **kwargs)
+            plt.xlabel(feature)
+        plt.tight_layout()
 
 
     def stack(self, var_name, **kwargs):
@@ -223,11 +246,20 @@ class ModelingData():
         return pd.DataFrame(scores)
 
 
+    def plot_proba(self, clf, target, **kwargs):
+
+        probabilities = self.predict_proba(clf)
+        target_name = 'proba_{}'.format(target)
+        reduced = probabilities[[target_name, 'target']]
+
+        return bamboo.plotting._series_hist(reduced.groupby('target')[target_name], **kwargs)
+
+
     def _cross_validate_score(self, clf, fit=False, **kwargs):
         return cross_validation.cross_val-score(clf, self.features, self.targets, **kwargs)
 
 
-    def get_classifier_performance_summary(self, clf, target, thresholds=np.arange(0.0, 1.0, 0.01), **kwargs):
+    def get_classifier_performance_summary(self, clf, target, thresholds=np.arange(0.0, 1.01, 0.01), **kwargs):
         """
         Take a classifier and a target
         and return a DataFrame listing the
@@ -236,8 +268,13 @@ class ModelingData():
         """
         probas = self.predict_proba(clf)
         threshold_summaries = [ModelingData.get_threshold_summary(probas, target, threshold) for threshold in thresholds]
-        return pd.DataFrame(threshold_summaries)
+        threshold_df = pd.DataFrame(threshold_summaries)
+        threshold_df = threshold_df.set_index('threshold')
+        return probas, threshold_df
 
+
+    def get_classifier_score_and_threshold_summary(self, clf, target, thresholds=np.arange(0.0, 1.01, 0.01), **kwargs):
+        pass
 
     @staticmethod
     def get_threshold_summary(probabilities, target, threshold=0.5, **kwargs):
@@ -259,8 +296,8 @@ class ModelingData():
         false_positives = positives[positives['target']!=target]
 
         negatives = probability_summary[probability_summary[probability_label] < threshold]
-        true_negatives = positives[positives['target'] != target]
-        false_negatives = positives[positives['target'] == target]
+        true_negatives = negatives[negatives['target'] != target]
+        false_negatives = negatives[negatives['target'] == target]
 
         num = len(probability_summary)
 
@@ -272,17 +309,18 @@ class ModelingData():
         num_true_negatives = len(true_negatives)
         num_false_negatives = len(false_negatives)
 
-        false_positive_rate = num_true_positives / num
-        true_positive_rate = num_false_positives / num
-
-        precision = num_true_positives / num_positives
-        recall = num_true_positives / (num_true_positives + num_false_negatives)
+        precision = num_true_positives / num_positives if num_positives > 0 else 0.0
+        recall = num_true_positives / (num_true_positives + num_false_negatives) if num_true_positives + num_false_negatives > 0 else 0.0
 
         sensitivity = recall
         specificity = num_true_negatives / (num_false_positives + num_true_negatives) if num_false_positives + num_true_negatives > 0 else 1.0
 
+        true_positive_rate = sensitivity
+        false_positive_rate = (1.0 - specificity)
+
+
         accuracy = (num_true_positives + num_true_negatives) / num
-        f1 = 2*num_true_positives / (2*num_true_positives + num_false_positives + num_false_negatives)
+        f1 = 2*num_true_positives / (2*num_true_positives + num_false_positives + num_false_negatives) if 2*num_true_positives + num_false_positives + num_false_negatives else 0.0
 
         return {'threshold': threshold,
                 'target': target,

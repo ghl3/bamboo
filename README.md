@@ -83,3 +83,49 @@ Bringing this all together, Bamboo makes it easy to manipulate and plot data:
         .hist(ax=plt.gca(), bins=np.arange(-100, 100, 10), alpha=0.5)
 
 ![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/image2.png)
+
+
+Modeling
+--------
+
+Bamboo comes with a number of functions and data structures that are designed for statistical modeling and machine learning.
+
+A convenient way to manipulate data for the purpose of classification or regression analysis is to use the bamboo.modeling.ModelingData class.  A ModelingData is a simple data structure that wraps a 2-d matrix (or pandas DataFrame) representing features and a 1-d matrix (or a pandas Series) that represents a set of targets for those features (either class labels or a value for regression).
+
+
+    features = pd.read_csv("features.csv")
+    targets = pd.read_csv("targets.csv")
+    
+    data = bamboo.modeling.ModelingData(features, targets)
+    
+One can also create a ModelingData directly from a single DataFrame
+
+	df = pd.read_csv("data.csv")
+	data = bamboo.modeling.ModelingData.from_dataframe(df, target='target')
+	
+	
+The advantage is that features and targets can be encapsulated into a single package and manipulated as a single object.  It also comes with a number of helper functions for common modeling tasks.
+
+	numeric_data = data.numeric_features()
+	
+	data.hist('feature1', bins=np.arange(0.0, 10.0, 1.0))
+	
+	clf = RandomForestClassifer()
+	data.fit(clf)
+	
+
+In particular, it makes it easy to do cross validation
+
+    training, testing = data.train_test_split()
+    
+    training_balanced = train.get_balanced()
+
+	clf = RandomForestClassifier
+	
+	training_balanced.fit(clf)
+    
+    print testing.get_classifier_performance_summary(clf, target='classA')
+    
+    # {'f1': 0.53846153846153844, 'target': 0.0, 'sensiticity': 0.5, 'recall': 0.5, 'false_positive_rate': 0.58333333333333337, 'false_positives': 5.0, 'precision': 0.58333333333333337, 'true_positives': 7.0, 'false_negatives': 7.0, 'true_positive_rate': 0.41666666666666669, 'specificity': 0.5, 'threshold': 0.0, 'true_negatives': 5.0, 'accuracy': 1.0}
+    
+    
