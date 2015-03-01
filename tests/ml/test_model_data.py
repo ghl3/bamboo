@@ -132,7 +132,7 @@ def test_probas():
 
     probas = data.predict_proba(clf)
 
-    eq_(probas[0], {'index': 0, 'proba_0': 0.64009602726273496, 'proba_1': 0.35990397273726504, 'target': 0})
+    eq_(dict(probas.irow(0)), {'index': 0, 'proba_0': 0.64009602726273496, 'proba_1': 0.35990397273726504, 'target': 0})
 
 
 def test_predict():
@@ -145,8 +145,8 @@ def test_predict():
 
     predictions = data.predict(reg)
 
-    eq_(predictions[0], {'predict': 5.8180999081003382e-16, 'index': 0, 'target': 0})
-    eq_(predictions[-1], {'predict': 1.0000000000000016, 'index': 11, 'target': 1})
+    eq_(dict(predictions.irow(0)), {'predict': 5.8180999081003382e-16, 'index': 0, 'target': 0})
+    eq_(dict(predictions.irow(-1)), {'predict': 1.0000000000000016, 'index': 11, 'target': 1})
 
 
 def test_summary():
@@ -159,4 +159,4 @@ def test_summary():
     probas = data.predict_proba(clf)
     summary = bamboo.ml.ModelingData.get_threshold_summary(probas, 1)
 
-    eq_(summary, {'sensiticity': 0.5, 'false_positives': 0, 'f1': 0.6666666666666666, 'precision': 1.0, 'false_negatives': 5, 'true_positive_rate': 0.0, 'specificity': 1.0, 'threshold': 0.5, 'target': 1, 'true_negatives': 0, 'recall': 0.5, 'false_positive_rate': 0.4166666666666667, 'true_positives': 5, 'accuracy': 0.4166666666666667})
+    eq_(dict(summary), {'sensiticity': 0.5, 'false_positives': 0, 'f1': 0.6666666666666666, 'precision': 1.0, 'false_negatives': 5, 'true_positive_rate': 0.0, 'specificity': 1.0, 'threshold': 0.5, 'target': 1, 'true_negatives': 0, 'recall': 0.5, 'false_positive_rate': 0.4166666666666667, 'true_positives': 5, 'accuracy': 0.4166666666666667})

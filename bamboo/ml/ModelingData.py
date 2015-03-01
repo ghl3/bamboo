@@ -197,7 +197,7 @@ class ModelingData():
 
             scores.append(res)
 
-        return scores
+        return pd.DataFrame(scores)
 
 
     def predict(self, reg):
@@ -210,7 +210,7 @@ class ModelingData():
             res['target'] = self.targets[idx]
             scores.append(res)
 
-        return scores
+        return pd.DataFrame(scores)
 
 
 
@@ -218,8 +218,20 @@ class ModelingData():
         return cross_validation.cross_val-score(clf, self.features, self.targets, **kwargs)
 
 
+    def get_classifier_performance_summary(self, clf, target, thresholds=np.arange(0.0, 1.0, 0.01), **kwargs):
+        """
+        Take a classifier and a target
+        and return a DataFrame listing the
+        performance result as various thresholds
+        for that classifier
+        """
+        probas = self.predict_proba(clf)
+        threshold_summaries = [get_threshold_summary(probas, target, threshold) for threshold in thresholds]
+        return pd.DataFrame(threshold_summaries)
+
+
     @staticmethod
-    def get_threshold_summary(probability_summary, target, threshold=0.5, **kwargs):
+    def get_threshold_summary(probabilities, target, threshold=0.5, **kwargs):
         """
         Takes a probability summary, a target we're
         trying to predict (that is represented in the
@@ -231,7 +243,7 @@ class ModelingData():
 
         probability_label = "proba_{}".format(target)
 
-        probability_summary = pd.DataFrame(probability_summary)
+        probability_summary = pd.DataFrame(probabilities)
 
         positives = probability_summary[probability_summary[probability_label] >= threshold]
         true_positives = positives[positives['target']==target]
