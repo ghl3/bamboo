@@ -8,6 +8,7 @@ from sklearn.cross_validation import ShuffleSplit
 from sklearn import cross_validation
 
 from bamboo.helpers import NUMERIC_TYPES
+import bamboo.plotting
 
 
 class ModelingData():
@@ -63,6 +64,15 @@ class ModelingData():
     def is_orthogonal(self, other):
         indices = set(self.features.index)
         return not any(idx in indices for idx in other.features.index)
+
+
+    def filter(self, filter_function):
+        keep = self.features.apply(filter_function, axis=1)
+        return ModelingData(self.features[keep], self.targets[keep])
+
+
+    def subset_features(self, features):
+        return ModelingData(self.features[features], self.targets)
 
 
     def fit(self, clf, *args, **kwargs):
