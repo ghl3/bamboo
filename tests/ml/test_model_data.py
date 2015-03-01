@@ -12,6 +12,7 @@ from pandas.util.testing import assert_frame_equal
 from numpy.random import RandomState
 
 from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
 
 group = [0, 0, 0, 0,
          1, 1, 1, 1,
@@ -122,7 +123,7 @@ def test_numeric_features():
 
 
 
-def test_scores():
+def test_probas():
 
     clf = LogisticRegression()
 
@@ -130,7 +131,20 @@ def test_scores():
 
     data.fit(clf)
 
-    scores = data.predict_proba(clf)
+    probas = data.predict_proba(clf)
 
-    eq_(scores[0], {'index': 0, 'proba_0': 0.64009602726273496, 'proba_1': 0.35990397273726504, 'target': 0})
+    eq_(probas[0], {'index': 0, 'proba_0': 0.64009602726273496, 'proba_1': 0.35990397273726504, 'target': 0})
 
+
+def test_predict():
+
+    reg = LinearRegression()
+
+    data = bamboo.ml.ModelingData.from_dataframe(df, target='group')
+
+    data.fit(reg)
+
+    predictions = data.predict(reg)
+
+    eq_(predictions[0], {'predict': 5.8180999081003382e-16, 'index': 0, 'target': 0})
+    eq_(predictions[-1], {'predict': 1.0000000000000016, 'index': 11, 'target': 1})
