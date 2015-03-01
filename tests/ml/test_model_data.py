@@ -23,9 +23,19 @@ feature2 = [10.0, 10.5, 9.5, 11.0,
             20.0, 20.0, 35.0, -10.0,
             0.0, 200.0, 150.0, -30.0]
 
+
+feature3 = ['A', 'A', 'B', 'C',
+            'C', 'B', 'D', 'B',
+            'A', 'B', 'C', 'D']
+
 df = pandas.DataFrame({'group':group,
                        'feature1':feature1,
                        'feature2':feature2})
+
+df2 = pandas.DataFrame({'group':group,
+                        'feature1':feature1,
+                        'feature2':feature2,
+                        'feature3':feature3})
 
 
 def test_split():
@@ -85,7 +95,6 @@ def test_balance_sample():
     eq_(value_counts[1], 10)
 
 
-
 def test_orthogonal():
 
     dataA = bamboo.ml.ModelingData.from_dataframe(df.iloc[0:6], target='group')
@@ -95,3 +104,16 @@ def test_orthogonal():
     assert(dataA.is_orthogonal(dataC))
     assert(not dataA.is_orthogonal(dataB))
     assert(not dataB.is_orthogonal(dataC))
+
+
+def test_numeric_features():
+
+    data = bamboo.ml.ModelingData.from_dataframe(df2, target='group')
+
+    eq_(data.shape(), (12,4))
+    assert('feature3' in data.features.columns)
+
+    numeric_data = data.numeric_features()
+
+    eq_(numeric_data.shape(), (12,3))
+    assert('feature3' not in numeric_data.features.columns)

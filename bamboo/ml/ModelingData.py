@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.preprocessing import balance_weights
 from sklearn.cross_validation import ShuffleSplit
 
+from bamboo.helpers import NUMERIC_TYPES
 
 class ModelingData():
     """
@@ -55,7 +56,7 @@ class ModelingData():
     def get_grouped_targets(self):
         return self.targets.groupby(self.targets)
 
-    
+
     def is_orthogonal(self, other):
         indices = set(self.features.index)
         return not any(idx in indices for idx in other.features.index)
@@ -147,7 +148,16 @@ class ModelingData():
 
 
     def numeric_features(self):
-        pass
+        """
+        Return a copy of thos ModelData that only contains
+        numeric features
+        """
+
+        dtypes = self.features.dtypes
+        numeric_dtypes = dtypes[dtypes.map(lambda x: x in NUMERIC_TYPES)]
+        numeric_feature_names = list(numeric_dtypes.index.values)
+
+        return ModelingData(self.features[numeric_feature_names], self.targets)
 
 
     def plot_auc_surve(self, clf):
