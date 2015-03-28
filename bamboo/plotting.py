@@ -20,6 +20,7 @@ from helpers import NUMERIC_TYPES
 import itertools
 
 
+# TODO: Implement this for floats
 def _draw_stacked_plot(dfgb, **kwargs):
     """
     Draw a vertical bar plot of multiple series
@@ -30,6 +31,11 @@ def _draw_stacked_plot(dfgb, **kwargs):
     """
 
     #color_cycle = ax._get_lines.color_cycle
+
+    if 'ax' in kwargs:
+        ax = kwargs.pop('ax')
+    else:
+        ax = plt.gca()
 
     series_dict = {}
 

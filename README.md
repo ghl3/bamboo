@@ -1,10 +1,52 @@
 bamboo
 ======
 
-Bamboo is a library that provides a set of tools intended to be used with Pandas.  It's primary goal is to make it easier and more intuitive to handle and visualize data.  Its design has an emphasis on immutable and composable functions that can be chained together to form more complicated data transformations.
+Bamboo is a library that provides a set of tools for plotting, manipulating, and modeling data.  It is built on top of Pandas and is designed to work well with Scikit-Learn.
+
+The primary goal of Bamboo is provide a set of utilities that make common data manipulations simple and easy and to reduce boilerplate when plotting or modeling.  Its design has an emphasis on immutable and composable functions that can be chained together to form more complicated data transformations.  It is in particular designed for exploring data that can be grouped together intro various classes, which is common in problems involving classification. 
 
 
-Examples
+Plotting
+--------
+
+Often, the first step in data analysis is visualization.  Bamboo provides functions to quickly explore a dataset.
+
+We start by assuming that we have a Pandas DataFrame of the following form:
+
+| id | class | feature1 | feature2 | feature3
+|----|-------|----------|----------|----------
+| 1  | 0     | 10.0     | 100      |    "A"
+| 2  | 0     | 10.0     | 200      |    "B"
+| 3  | 1     | 20.0     | 150      |    "A"
+| 4  | 1     | 25.0     | 250      |    "B"
+| 5  | 2     | -15.0    | 0        |    "A"
+| 6  | 2     | -25.0    | 20       |    "B"
+
+Specifically, we have a column (or possibly several) that can be used to group the data, and then we have a number of columns that can be interpreted as features (which can be either numeric or nominal/string-like).
+
+A common thing to do when faced with data of this structure is to visualize the distribution of the various features across classes.  This allows us to determine if a particular has the power to distinguish between classes.  One way to visualize this is by creating overlapping plots of data broken up by a class.  This is easy with bamboo.
+
+    from bamboo import hist
+	hist(df.groupby('group').feature1,
+		ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
+
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_hist_float.png)
+
+The "hist" function works on both numeric and nominal features
+
+	hist(df.gropupby('group').feature3, alpha=0.5)
+
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_hist_nominal.png)
+
+One can also visualize the relationship between features using a scatter plot with points from different groups labeled separately
+
+	from bamboo import scatter
+	scatter(df.groupby('group'), 'feature1', 'feature2', alpha=0.5)
+
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_scatter.png)
+
+
+Data Manipulation
 -------
 
 For these examples, assume that we have a Pandas DataFrame structured similarly to the following:

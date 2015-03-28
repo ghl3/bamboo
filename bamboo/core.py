@@ -4,7 +4,9 @@ from pandas.core.groupby import DataFrame, GroupBy
 from singledispatch import singledispatch
 from inspect import getmembers, isfunction
 
+
 from bamboo import groups
+from bamboo import plotting
 from BambooObjects import _wrap_with_bamboo
 
 
@@ -50,3 +52,4 @@ def _(df, x, y, **kwargs):
 @scatter.register(GroupBy)
 def _(df, x, y, **kwargs):
     return groups.scatter(df, x, y, **kwargs)
+

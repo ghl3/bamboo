@@ -187,6 +187,7 @@ def _(dfgb, var=None, *args, **kwargs):
                 print e
 
 
+
 def hist_functions(dfgb, *args, **kwargs):
     """
     Take a DataFrameGroupBy and a list of functions and make a
