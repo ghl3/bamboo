@@ -14,6 +14,8 @@ from numpy.random import RandomState
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import LinearRegression
 
+from nose.tools import assert_dict_equal
+
 group = [0, 0, 0, 0,
          1, 1, 1, 1,
          0, 0, 0, 1]
@@ -160,7 +162,7 @@ def test_summary():
     probas = data.predict_proba(clf)
     summary = bamboo.modeling.ModelingData.get_threshold_summary(probas, 1)
 
-    eq_(dict(summary), {'sensiticity': 0.5, 'false_positives': 0, 'f1': 0.6666666666666666, 'precision': 1.0, 'false_negatives': 5, 'true_positive_rate': 0.0, 'specificity': 1.0, 'threshold': 0.5, 'target': 1, 'true_negatives': 0, 'recall': 0.5, 'false_positive_rate': 0.4166666666666667, 'true_positives': 5, 'accuracy': 0.4166666666666667})
+    assert_dict_equal(dict(summary), {'sensiticity': 0.5, 'false_positives': 0, 'f1': 0.6666666666666666, 'precision': 1.0, 'false_negatives': 5, 'true_positive_rate': 0.0, 'specificity': 1.0, 'threshold': 0.5, 'target': 1, 'true_negatives': 0, 'recall': 0.5, 'false_positive_rate': 0.4166666666666667, 'true_positives': 5, 'accuracy': 0.4166666666666667})
 
 
 def test_classifier_performance_summary():
@@ -170,7 +172,7 @@ def test_classifier_performance_summary():
     data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
     data.fit(clf)
 
-    summary = data.get_classifier_performance_summary(clf, 0, thresholds=np.arange(0.0, 1.0, 0.1))
+    probas, summary = data.get_classifier_performance_summary(clf, 0, thresholds=np.arange(0.0, 1.0, 0.1))
 
-    eq_(dict(summary.irow(0)), {'f1': 0.53846153846153844, 'target': 0.0, 'sensiticity': 0.5, 'recall': 0.5, 'false_positive_rate': 0.58333333333333337, 'false_positives': 5.0, 'precision': 0.58333333333333337, 'true_positives': 7.0, 'false_negatives': 7.0, 'true_positive_rate': 0.41666666666666669, 'specificity': 0.5, 'threshold': 0.0, 'true_negatives': 5.0, 'accuracy': 1.0})
+    assert_dict_equal(dict(summary.irow(0)), {'f1': 0.73684210526315785, 'target': 0.0, 'sensiticity': 1.0, 'recall': 1.0, 'false_positive_rate': 1.0, 'false_positives': 5.0, 'precision': 0.58333333333333337, 'true_positives': 7.0, 'false_negatives': 0.0, 'true_positive_rate': 1.0, 'specificity': 0.0, 'true_negatives': 0.0, 'accuracy': 0.58333333333333337})
 

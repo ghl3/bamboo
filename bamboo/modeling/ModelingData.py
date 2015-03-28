@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from sklearn.preprocessing import balance_weights
+from sklearn.preprocessing._weights import _balance_weights as balance_weights
 from sklearn.cross_validation import ShuffleSplit
 from sklearn import cross_validation
 
