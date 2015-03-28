@@ -1,6 +1,6 @@
 
 import pandas
-import bamboo.modeling
+import bamboo.modeling.tools
 
 import sklearn.ensemble
 from sklearn import cross_validation
@@ -29,34 +29,34 @@ fitted = classifier.fit(features, targets)
 
 
 def test_balance_dataset():
-    bamboo.modeling.balance_dataset(df.groupby('group'))
+    bamboo.modeling.tools.balance_dataset(df.groupby('group'))
 
 
 def test_get_prediction():
-    predictions = bamboo.modeling.get_prediction(fitted, features, targets)
+    predictions = bamboo.modeling.tools.get_prediction(fitted, features, targets)
     print '\n'
     print predictions.head()
 
 
 def test_get_scores():
     skf = cross_validation.StratifiedKFold(targets, n_folds=2)
-    predictions = bamboo.modeling.get_scores(classifier, features, targets, skf)
+    predictions = bamboo.modeling.tools.get_scores(classifier, features, targets, skf)
     print '\n'
     for prediction in predictions:
         print prediction.head()
 
 
 def test_plot_roc_curve():
-    predictions = bamboo.modeling.get_prediction(fitted, features, targets)
-    bamboo.modeling.plot_roc_curve(df['group'], predictions['predict_proba_0'])
+    predictions = bamboo.modeling.tools.get_prediction(fitted, features, targets)
+    bamboo.modeling.tools.plot_roc_curve(df['group'], predictions['predict_proba_0'])
 
 
 def test_plot_precision_recall_curve():
-    predictions = bamboo.modeling.get_prediction(fitted, features, targets)
-    bamboo.modeling.plot_precision_recall_curve(df['group'], predictions['predict_proba_0'])
+    predictions = bamboo.modeling.tools.get_prediction(fitted, features, targets)
+    bamboo.modeling.tools.plot_precision_recall_curve(df['group'], predictions['predict_proba_0'])
 
 
 def test_plot_distribution():
-    bamboo.modeling.plot_distribution(classifier, features, targets)
+    bamboo.modeling.tools.plot_distribution(classifier, features, targets)
 
 

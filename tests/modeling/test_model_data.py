@@ -54,8 +54,8 @@ def test_split():
 
     print train, test
 
-    eq_(train.shape(), (9,3))
-    eq_(test.shape(), (3,3))
+    eq_(train.shape(), (9,2))
+    eq_(test.shape(), (3,2))
 
     assert(train.is_orthogonal(test))
 
@@ -116,12 +116,12 @@ def test_numeric_features():
 
     data = bamboo.modeling.ModelingData.from_dataframe(df2, target='group')
 
-    eq_(data.shape(), (12,4))
+    eq_(data.shape(), (12,3))
     assert('feature3' in data.features.columns)
 
     numeric_data = data.numeric_features()
 
-    eq_(numeric_data.shape(), (12,3))
+    eq_(numeric_data.shape(), (12,2))
     assert('feature3' not in numeric_data.features.columns)
 
 
@@ -135,7 +135,7 @@ def test_probas():
 
     probas = data.predict_proba(clf)
 
-    eq_(dict(probas.irow(0)), {'index': 0, 'proba_0': 0.64009602726273496, 'proba_1': 0.35990397273726504, 'target': 0})
+    eq_(dict(probas.irow(0)), {'index': 0.0, 'proba_0': 0.58298495576378184, 'proba_1': 0.41701504423621821, 'target': 0.0})
 
 
 def test_predict():
@@ -148,8 +148,8 @@ def test_predict():
 
     predictions = data.predict(reg)
 
-    eq_(dict(predictions.irow(0)), {'predict': 5.8180999081003382e-16, 'index': 0, 'target': 0})
-    eq_(dict(predictions.irow(-1)), {'predict': 1.0000000000000016, 'index': 11, 'target': 1})
+    eq_(dict(predictions.irow(0)), {'predict': 0.15360473177939843, 'index': 0.0, 'target': 0.0})
+    eq_(dict(predictions.irow(-1)), {'predict': 1.2116420074937881, 'index': 11.0, 'target': 1.0})
 
 
 def test_summary():
@@ -162,7 +162,7 @@ def test_summary():
     probas = data.predict_proba(clf)
     summary = bamboo.modeling.ModelingData.get_threshold_summary(probas, 1)
 
-    assert_dict_equal(dict(summary), {'sensiticity': 0.5, 'false_positives': 0, 'f1': 0.6666666666666666, 'precision': 1.0, 'false_negatives': 5, 'true_positive_rate': 0.0, 'specificity': 1.0, 'threshold': 0.5, 'target': 1, 'true_negatives': 0, 'recall': 0.5, 'false_positive_rate': 0.4166666666666667, 'true_positives': 5, 'accuracy': 0.4166666666666667})
+    assert_dict_equal(dict(summary), {'sensiticity': 1.0, 'target': 1, 'f1': 1.0, 'recall': 1.0, 'false_positive_rate': 0.0, 'false_positives': 0, 'precision': 1.0, 'true_positives': 5, 'false_negatives': 0, 'true_positive_rate': 1.0, 'specificity': 1.0, 'threshold': 0.5, 'true_negatives': 7, 'accuracy': 1.0})
 
 
 def test_classifier_performance_summary():

@@ -93,7 +93,7 @@ class ModelingData():
         random_state = kwargs.pop('random_state', None)
 
         if test_size is None and train_size is None:
-                    test_size = 0.25
+            test_size = 0.25
 
         n_samples = len(self.targets)
 
@@ -239,7 +239,7 @@ class ModelingData():
 
         for idx, row in self.features.iterrows():
             res = {'index': idx}
-            res['predict'] = reg.predict(row)
+            res['predict'] = reg.predict(row)[0]
             res['target'] = self.targets[idx]
             scores.append(res)
 

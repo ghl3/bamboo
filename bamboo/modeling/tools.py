@@ -24,7 +24,7 @@ from sklearn.metrics import roc_curve, auc
 from random import sample
 #from plotting import hist
 
-from helpers import NUMERIC_TYPES
+from bamboo.helpers import NUMERIC_TYPES
 
 import matplotlib.pyplot as plt
 
