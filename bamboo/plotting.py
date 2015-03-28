@@ -114,6 +114,9 @@ def _series_hist_float(dfgb, ax=None, autobin=False, normed=False, normalize=Fal
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
+        if len(srs.values)==1 and 'bins' not in kwargs:
+            kwargs['bins'] = [srs.values[0] - 0.05, srs.values[0] + 0.05]
+
         srs.hist(ax=ax, color=color, label=str(label), normed=normed, **kwargs)
 
 
