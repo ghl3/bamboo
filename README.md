@@ -78,23 +78,11 @@ Imagine that we want to group our data by the class column but only return those
 
 The return value is a DataFrameGroupBy with only two of the three groups remaining (those that satisfy the given predicate).
 
-
-A common practice is to create overlapping plots of data broken up by a class.  This is easy with bamboo.
-
-        hist(df.groupby('group').feature1,
-            ax=plt.gca(), bins=np.arange(-50, 60, 10), alpha=0.5)
-
-![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/image1.png)
-
-
-    hist(df.groupby('group')['feature1'])
-
-
 Bamboo functions are meant to be composable.  So, let's say that I want to group by the group, filter out groups with a small mean of feature1, and then sort the reamining groups by their mean of feature 2.  One can simply do:
 
     sorted_groups(filter_groups(df.groupby('group'), lambda x: x['feature1'].mean() > 0), lambda x: x['feature2'].mean())
 
-While this works, composing functions like this can make them become less and less readable (and makes it harder to write).  This is a familiar issue with lisp languages.
+While this works, composing functions like this can make them become less and less readable (and makes it harder to write).
 
 Fortunately, bamboo exposes a solution to this.  Bamboo uses subclasses of common Pandas classes that have many of bamboo's helper functions available as methods.  One can create these classes by wrapping a Pandas object with the 'wrap' function:
 
@@ -121,10 +109,10 @@ Bringing this all together, Bamboo makes it easy to manipulate and plot data:
 
     wrap(df) \
         .groupby('group') \
-        .map_groups(lambda x: x.feature1 + x.feature1, name='mean') \
-        .hist(ax=plt.gca(), bins=np.arange(-100, 100, 10), alpha=0.5)
+        .map_groups(lambda x: x.feature1 + x.feature1, name='feature_sum') \
+        .hist(ax=plt.gca(), bins=np.arange(-5, 5, 0.5), alpha=0.5)
 
-![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/image2.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_manipulationscatter.png)
 
 
 Modeling

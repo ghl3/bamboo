@@ -77,3 +77,22 @@ def test_scatter():
     scatter(df.groupby('class'), 'feature1', 'feature2', alpha=0.5)
 
     plt.savefig('tests/images/readme_scatter.png')
+
+
+
+
+def test_manipulation():
+
+    df = create_dataset()
+
+    plt.clf()
+
+    from bamboo import wrap
+
+    wrap(df) \
+        .groupby('class') \
+        .map_groups(lambda x: x.feature1 + x.feature1, name='feature_sum') \
+        .hist(ax=plt.gca(), bins=np.arange(-5, 5, 0.5), alpha=0.5)
+
+    plt.savefig('tests/images/readme_manipulationscatter.png')
+
