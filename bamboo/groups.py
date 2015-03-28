@@ -71,9 +71,12 @@ def sorted_groups(dfgb, key):
 
 def map_groups(dfgb, func, name=None):
     """
-    Take a DataFrameGroupBy and apply a function
-    to the DataFrames, returning a seriesgroupby
-    of the values
+    Take a DataFrameGroupBy and a function that takes a DataFrame
+    and returns a Series.  Apply that function to the DataFrame
+    of each group and return a SeriesGroupBy with the same grouping
+    as the original DataFrameGroupBy but where the value of
+    each group is the value of the function applied to the corresponding
+    dataframe in the original group.
     """
 
     if name is None:

@@ -17,7 +17,7 @@ def test_wrap():
         .groupby('group') \
         .filter_groups(lambda x: x['group'].mean() > 0) \
         .sorted_groups(lambda x: x['feature2'].mean()) \
-        .map_groups(lambda x: x['feature1'].mean(), name='mean') \
+        .map_groups(lambda x: x['feature1']*2, name="2_x_feature1") \
         .sum() \
         .hist(ax=plt.gca())
 

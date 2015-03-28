@@ -27,7 +27,7 @@ def test_filter_groups():
 
 def test_take_groups():
     """
-    Return only groups with size > 3
+    Get the first group
     """
 
     dfgb = create_test_df().groupby('group')
@@ -41,6 +41,21 @@ def test_take_groups():
                                  index=[0, 1, 2, 3, 6]).groupby('group')
 
     assert_equals(filtered, should_be)
+
+
+def test_map_groups():
+    """
+    Map a function onto a DataFrameGroupBy
+    """
+
+    dfgb = create_test_df().groupby('group')
+
+    mapped = map_groups(dfgb, lambda x: x.feature1 + x.feature2, name='sum')
+
+    should_be = pandas.Series([11.0, 11.5, 10.5, 12.0, 22.0, 22.0, 3.0, 204.0])\
+                      .groupby([0, 0, 0, 0, 1, 1, 0, 1])
+
+    assert_series_equal(mapped.obj, should_be.obj)
 
 
 def test_sort_v2():
