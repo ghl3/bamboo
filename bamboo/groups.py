@@ -164,7 +164,7 @@ def hist(dfgb, *args, **kwargs):
     and plots histograms of the variable 'var'
     for each of the groups.
     """
-    pass
+    raise NotImplementedError()
 
 
 @hist.register(SeriesGroupBy)

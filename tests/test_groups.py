@@ -80,8 +80,14 @@ def test_sort_v2():
 
 
 @plotting
-def test_hist_functions():
+def test_hist():
+    dfgb = create_test_df_v3().groupby('group')
+    hist(dfgb['feature1'])
+    #hist(dfgb['feature2'])
 
+
+@plotting
+def test_hist_functions():
     dfgb = create_test_df_v2().groupby('group')
     hist_functions(dfgb, lambda x: x.feature1+x.feature2, lambda x: x.feature1-x.feature2)
 
