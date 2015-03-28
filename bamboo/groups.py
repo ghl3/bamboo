@@ -102,17 +102,37 @@ def take_groups(dfgb, n):
 def pivot_groups(mdfgb, func, **kwargs):
     """
     Pivot a DataFrameGroupBy that is grouped by
-    exactly 2 gruped (hierarical index)
+    exactly 2 groups (hierarical index)
     and return a new DataFrame that is pivoted by
     those two groups and whose cell value is the
     value of the given function.
+
+    Example:
+
+    df =
+    group1 group2  val
+       A      X    1
+       B      Y    2
+       C      Z    3
+
+    pivot_groups(df.groupby(['group1', 'group2']), lambda x: x.val*2)
+
+    group2   X   Y   Z
+    group1
+    A        2 NaN NaN
+    B      NaN   4 NaN
+    C      NaN NaN   6
     """
 
     assert(mdfgb.first().index.nlevels==2)
 
     x, y = mdfgb.first().index.names
 
-    return mdfgb.apply(func).reset_index().pivot(index=x, columns=y, **kwargs)
+    mdfgb_applied = mdfgb.apply(func).reset_index(level=[x, y])
+
+    c = [column for column in mdfgb_applied if column not in (x, y)][0]
+
+    return mdfgb_applied.pivot_table(index=x, columns=y, values=c,  **kwargs)
 
 
 def apply_groups(dfgb, *args, **kwargs):
