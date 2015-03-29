@@ -54,6 +54,7 @@ class BambooDataFrame(pandas.DataFrame):
     def __init__(self, *args, **kwargs):
         super(BambooDataFrame, self).__init__(*args, **kwargs)
 
+
     def groupby(self, *args, **kwargs):
         return _wrap_with_bamboo(super(BambooDataFrame, self).groupby(*args, **kwargs))
 
@@ -109,6 +110,10 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
         return bamboo.head(self, *args, **kwargs)
 
 
+    def hist(self, *args, **kwargs):
+        return plotting._frame_hist(self, *args, **kwargs)
+
+
     def __getattribute__(self, *args, **kwargs):
         val = super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs)
         if ismethod(val):
@@ -154,8 +159,13 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
                                              other.group_keys,
                                              other.squeeze)
 
+
     def head(self, *args, **kwargs):
         return bamboo.head(self, *args, **kwargs)
+
+
+    def hist(self, *args, **kwargs):
+        return plotting._series_hist(self, *args, **kwargs)
 
 
     def __getattribute__(self, *args, **kwargs):
@@ -171,8 +181,6 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
     def __getattr__(self, *args, **kwargs):
 
         name, pargs = args[0], args[1:]
-
-        print "Wrapping {}".format(name)
 
         if name in _bamboo_methods:
             return _create_bamboo_wrapper(self, _bamboo_methods[name])
