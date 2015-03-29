@@ -5,6 +5,8 @@ import bamboo.frames
 
 from helpers import *
 
+from bamboo import hist
+
 group = ['A', 'A', 'A', 'A',
          'B', 'B',
          'C']
@@ -31,10 +33,14 @@ def test_hexbin():
 
 @plotting
 def test_hist_df():
-    bamboo.groups.hist(df.groupby('group'))
+    bamboo.core.hist(df.groupby('group'))
 
 @plotting
 def test_hist_var():
-    bamboo.groups.hist(df.groupby('group'), 'feature1')
+    bamboo.core.hist(df.groupby('group'), 'feature1')
 
-
+@plotting
+def test_hist():
+    dfgb = create_test_df_v3().groupby('group')
+    hist(dfgb['feature1'])
+    #hist(dfgb['feature2'])

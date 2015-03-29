@@ -154,6 +154,20 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, *args, **kwargs):
         value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
 
 
+def _frame_hist(dfgb, var=None, *args, **kwargs):
+    if var is not None:
+        _series_hist(dfgb[var], *args, **kwargs)
+    else:
+        for (var, series) in dfgb._iterate_column_groupbys():
+            plt.figure()
+            try:
+                _series_hist(series, *args, **kwargs)
+                plt.xlabel(var)
+            except TypeError as e:
+                print "Failed to plot %s" % var
+                print e
+
+
 def _get_variable_binning(var, nbins=10, int_bound=40):
     """
     Get the binning of a variable.
@@ -200,3 +214,5 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     bins = np.arange(nbins+1)/nbins * (var_max - var_min) + var_min
 
     return bins
+
+

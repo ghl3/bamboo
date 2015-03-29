@@ -14,8 +14,6 @@ import inspect
 import matplotlib.pyplot as plt
 from math import floor, ceil
 
-from pandas.core.groupby import DataFrameGroupBy
-from pandas.core.groupby import SeriesGroupBy
 
 
 """
@@ -157,34 +155,34 @@ def apply_groups(dfgb, *args, **kwargs):
     return pd.DataFrame(res).groupby(dfgb.grouper)
 
 
-@singledispatch
-def hist(dfgb, *args, **kwargs):
-    """
-    Takes a data frame (grouped by a variable)
-    and plots histograms of the variable 'var'
-    for each of the groups.
-    """
-    raise NotImplementedError()
+# @singledispatch
+# def hist(dfgb, *args, **kwargs):
+#     """
+#     Takes a data frame (grouped by a variable)
+#     and plots histograms of the variable 'var'
+#     for each of the groups.
+#     """
+#     raise NotImplementedError()
 
 
-@hist.register(SeriesGroupBy)
-def _(sgb, *args, **kwargs):
-    plotting._series_hist(sgb, *args, **kwargs)
+# @hist.register(SeriesGroupBy)
+# def _(sgb, *args, **kwargs):
+#     plotting._series_hist(sgb, *args, **kwargs)
 
 
-@hist.register(DataFrameGroupBy)
-def _(dfgb, var=None, *args, **kwargs):
-    if var is not None:
-        plotting._series_hist(dfgb[var], *args, **kwargs)
-    else:
-        for (var, series) in dfgb._iterate_column_groupbys():
-            plt.figure()
-            try:
-                plotting._series_hist(series, *args, **kwargs)
-                plt.xlabel(var)
-            except TypeError as e:
-                print "Failed to plot %s" % var
-                print e
+# @hist.register(DataFrameGroupBy)
+# def _(dfgb, var=None, *args, **kwargs):
+#     if var is not None:
+#         plotting._series_hist(dfgb[var], *args, **kwargs)
+#     else:
+#         for (var, series) in dfgb._iterate_column_groupbys():
+#             plt.figure()
+#             try:
+#                 plotting._series_hist(series, *args, **kwargs)
+#                 plt.xlabel(var)
+#             except TypeError as e:
+#                 print "Failed to plot %s" % var
+#                 print e
 
 
 
@@ -209,7 +207,7 @@ def hist_functions(dfgb, *args, **kwargs):
 
     for i, function in enumerate(functions):
         plt.subplot(rows, cols, i+1)
-        hist(map_groups(dfgb, function), **kwargs)
+        plotting._series_hist(map_groups(dfgb, function), **kwargs)
         plt.xlabel(function.__name__)
 
 

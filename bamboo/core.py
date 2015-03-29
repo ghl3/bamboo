@@ -1,5 +1,7 @@
 
 from pandas.core.groupby import DataFrame, GroupBy
+from pandas.core.groupby import DataFrameGroupBy
+from pandas.core.groupby import SeriesGroupBy
 
 from singledispatch import singledispatch
 from inspect import getmembers, isfunction
@@ -9,6 +11,11 @@ from bamboo import groups
 from bamboo import plotting
 from BambooObjects import _wrap_with_bamboo
 
+
+
+# This module defines the core API and handles
+# polymorphic dispatch routing to various
+# functions throughout the bamboo code
 
 def wrap(obj):
     return _wrap_with_bamboo(obj)
@@ -34,9 +41,14 @@ def hist(df, *args, **kwargs):
     return df.hist(*args, **kwargs)
 
 
-@hist.register(GroupBy)
-def _(dfgb, *args, **kwargs):
-    return groups.hist(dfgb, *args, **kwargs)
+@hist.register(SeriesGroupBy)
+def _(sgb, *args, **kwargs):
+    plotting._series_hist(sgb, *args, **kwargs)
+
+
+@hist.register(DataFrameGroupBy)
+def _(sgb, *args, **kwargs):
+    plotting._frame_hist(sgb, *args, **kwargs)
 
 
 @singledispatch

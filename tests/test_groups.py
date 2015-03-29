@@ -79,11 +79,6 @@ def test_sort_v2():
     eq_(group_order, [3, 0, 4, 1])
 
 
-@plotting
-def test_hist():
-    dfgb = create_test_df_v3().groupby('group')
-    hist(dfgb['feature1'])
-    #hist(dfgb['feature2'])
 
 
 @plotting
