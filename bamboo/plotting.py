@@ -81,6 +81,7 @@ def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, *a
     and plots histograms of the variable 'var'
     for each of the groups.
     """
+
     if ax is None:
         ax = plt.gca()
 
@@ -155,6 +156,7 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, *args, **kwargs):
 
 
 def _frame_hist(dfgb, var=None, *args, **kwargs):
+
     if var is not None:
         _series_hist(dfgb[var], *args, **kwargs)
     else:

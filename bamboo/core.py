@@ -9,17 +9,11 @@ from inspect import getmembers, isfunction
 
 from bamboo import groups
 from bamboo import plotting
-from BambooObjects import _wrap_with_bamboo
-
 
 
 # This module defines the core API and handles
 # polymorphic dispatch routing to various
 # functions throughout the bamboo code
-
-def wrap(obj):
-    return _wrap_with_bamboo(obj)
-
 
 @singledispatch
 def head(df, n=5):

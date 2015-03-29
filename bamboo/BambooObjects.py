@@ -8,9 +8,9 @@ from inspect import getmembers, isfunction, ismethod
 import core, groups, frames, plotting
 
 
-_bamboo_methods = {name:func  for name, func in getmembers(core) if isfunction(func)}
-_frames_methods = {name:func  for name, func in getmembers(frames) if isfunction(func)}
-_groups_methods = {name:func  for name, func in getmembers(groups) if isfunction(func)}
+_bamboo_methods = {name:func for name, func in getmembers(core) if isfunction(func)}
+_frames_methods = {name:func for name, func in getmembers(frames) if isfunction(func)}
+_groups_methods = {name:func for name, func in getmembers(groups) if isfunction(func)}
 _plot_methods = {} #{name:func  for name, func in getmembers(plotting) if isfunction(func)}
 
 
@@ -27,6 +27,10 @@ def _wrap_with_bamboo(obj):
 
     else:
         return obj
+
+
+def wrap(obj):
+    return _wrap_with_bamboo(obj)
 
 
 def _create_bamboo_wrapper(obj, func):
@@ -127,7 +131,6 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
 
         if name in _groups_methods:
             return _create_bamboo_wrapper(self, _groups_methods[name])
-            return ret_val
 
         res = super(BambooDataFrameGroupBy, self).__getattr__(*args, **kwargs)
         return _wrap_with_bamboo(res)
@@ -169,6 +172,8 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
 
         name, pargs = args[0], args[1:]
 
+        print "Wrapping {}".format(name)
+
         if name in _bamboo_methods:
             return _create_bamboo_wrapper(self, _bamboo_methods[name])
 
@@ -178,5 +183,6 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
         if name in _groups_methods:
             return _create_bamboo_wrapper(self, _groups_methods[name])
 
+        #return _wrap_instance_method(super(BambooSeriesGroupBy, self).__getattr__(*args, **kwargs))
         res = super(BambooSeriesGroupBy, self).__getattr__(*args, **kwargs)
         return _wrap_with_bamboo(res)

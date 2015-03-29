@@ -112,7 +112,7 @@ Bringing this all together, Bamboo makes it easy to manipulate and plot data:
         .map_groups(lambda x: x.feature1 + x.feature1, name='feature_sum') \
         .hist(ax=plt.gca(), bins=np.arange(-5, 5, 0.5), alpha=0.5)
 
-![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_manipulationscatter.png)
+![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_manipulation_hist.png)
 
 
 Modeling
