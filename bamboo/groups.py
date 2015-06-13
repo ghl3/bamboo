@@ -1,3 +1,4 @@
+from __future__ import division
 
 from collections import OrderedDict
 
@@ -13,6 +14,7 @@ import inspect
 
 import matplotlib.pyplot as plt
 from math import floor, ceil
+
 
 
 
@@ -261,3 +263,26 @@ def stacked_counts_plot(dfgb, category, ratio=False, **kwargs):
 
 def save_grouped_hists(dfgb, output_file, title=None, *args, **kwargs):
     _save_plots(dfgb, plotting._series_hist, output_file, title, *args, **kwargs)
+
+
+def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12,4), **kwargs):
+
+    columns = dfgb.obj.columns
+
+    for i, feature in enumerate(columns):
+
+        if i % subplot_columns == 0:
+            fig = plt.figure(figsize=figsize)
+
+        plt.subplot(1, subplot_columns, (i%subplot_columns) + 1)
+        #plt.subplot(x, y, i+1)
+        try:
+            if binning_map and feature in binning_map:
+                plotting._frame_hist(dfgb, feature, bins=bins, **kwargs)
+            else:
+                plotting._frame_hist(dfgb, feature, autobin=True, **kwargs)
+        except Exception as e:
+            print e
+        plt.xlabel(feature)
+
+    plt.tight_layout()

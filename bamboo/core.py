@@ -62,3 +62,7 @@ def _(df, x, y, **kwargs):
 
 def wrap(*args, **kwargs):
     return BambooObjects.wrap(*args, **kwargs)
+
+
+def hist_all(*args, **kwargs):
+    return groups.hist_all(*args, **kwargs)
