@@ -62,6 +62,5 @@ def _create_summary_table(series_map, bins=None):
                       loc='upper center')
 
     _make_table_pretty(table)
-    plt.show()
 
     return table

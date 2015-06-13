@@ -1,7 +1,10 @@
 
+import numpy as np
+
 import pandas
 import bamboo.groups
 import bamboo.frames
+import bamboo.addons
 
 from helpers import *
 
@@ -51,3 +54,15 @@ def test_hist():
     dfgb = create_test_df_v3().groupby('group')
     hist(dfgb['feature1'])
     #hist(dfgb['feature2'])
+
+
+@plotting
+def test_summary_table():
+    df = pandas.DataFrame({'group': ['GOOD', 'GOOD', 'GOOD', 'GOOD', 'BAD', 'BAD', 'BAD'],
+                           'x': [1, 2, 1, 3.4, 2, 5.6, 3],
+                           'y':[10, 50, 10, 20, 20, 40, -10]})
+    bamboo.hist(df.groupby('group'), 'x',
+                addons=[bamboo.addons.summary_table],
+                bins=np.arange(0, 5, 1),
+                alpha=0.5)
+
