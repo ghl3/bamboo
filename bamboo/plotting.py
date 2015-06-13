@@ -75,12 +75,12 @@ def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
     pdf.close()
 
 
-def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, add_ons=None, *args, **kwargs):
+def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, addons=None, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
     for each of the groups.
-    May take a list of 'add_ons', which are functions
+    May take a list of 'addons', which are functions
     that take additional action on the plotted data
     (for example, they may add specific decoration to
     the plot based on the data, such as a table or
@@ -97,15 +97,18 @@ def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, ad
     else:
         plot_result = _series_hist_nominal(dfgb, ax, normalize=normed_or_normalize, *args, **kwargs)
 
-    plt.legend(loc='best', fancybox=True)
+    if dfgb.obj.name:
+        plt.xlabel(dfgb.obj.name)
 
-    if add_ons:
-        for add_on_func in add_ons:
+    if addons:
+        for add_on_func in addons:
             add_on_func(**plot_result)
+
+    plt.legend(loc='best', fancybox=True)
 
 
 def _series_hist_float(dfgb, ax=None, autobin=False, normed=False, normalize=False,
-                       stacked=False, add_ons=None, *args, **kwargs):
+                       stacked=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -140,7 +143,7 @@ def _series_hist_float(dfgb, ax=None, autobin=False, normed=False, normalize=Fal
         srs.hist(ax=ax, color=color, label=str(label), normed=normed, bins=bins, **kwargs)
         series_map[label] = srs
 
-    return {'type': 'FLOAT', 'grouped': dfgb, 'series': series_map, 'bins': bins}
+    return {'type': 'FLOAT', 'grouped': dfgb, 'series_map': series_map, 'bins': bins}
 
 
 def _series_hist_nominal(dfgb, ax=None, normalize=False, dropna=False, *args, **kwargs):
@@ -176,7 +179,7 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, dropna=False, *args, **
         value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
         series_map[label] = srs
 
-    return {'type': 'NOMINAL', 'grouped': dfgb, 'series': series_map}
+    return {'type': 'NOMINAL', 'grouped': dfgb, 'series_map': series_map}
 
 
 def _frame_hist(dfgb, var=None, *args, **kwargs):

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def summary_table(type, series_map, bins=None):
+def summary_table(type, series_map, bins=None, **kwargs):
     """
     Draw a table describing the number of
     elements of each group for either nominal
@@ -12,9 +12,9 @@ def summary_table(type, series_map, bins=None):
     """
 
     if type == 'FLOAT':
-        return _summary_table_float(series_map, bins)
+        return _create_summary_table(series_map, bins)
     elif type == 'NOMINAL':
-        return _summary_table_nominal(series_map)
+        return _create_summary_table(series_map)
     else:
         raise NotImplementedError()
 
@@ -28,7 +28,6 @@ def _make_table_pretty(table):
     row_label_cells = [cell for (x, y), cell in table.properties()['celld'].iteritems()
                        if y==-1]
 
-    print row_label_cells
     for cell in row_label_cells:
         cell.set_width(cell.get_width()*5)
 
@@ -36,9 +35,7 @@ def _make_table_pretty(table):
     table.set_fontsize(8)
 
 
-def _summary_table_float(series_map, bins):
-
-    print bins, min(bins), max(bins)
+def _create_summary_table(series_map, bins=None):
 
     rows = []
     row_labels = []
@@ -47,9 +44,13 @@ def _summary_table_float(series_map, bins):
 
         total_num = len(srs)
         not_null = len(srs[pd.notnull(srs)])
-        not_shown = len(srs[(pd.isnull(srs)) | (srs > max(bins)) | (srs < min(bins))])
 
-        pct_shown = "{}%".format((total_num - not_shown) / total_num * 100.0)
+        if bins is not None:
+            not_shown = len(srs[(pd.isnull(srs)) | (srs > max(bins)) | (srs < min(bins))])
+        else:
+            not_shown = len(srs[(pd.isnull(srs))])
+
+        pct_shown = "{number:.{digits}f}%".format(number=(total_num - not_shown) / total_num * 100.0, digits=1)
 
         row_labels.append(group)
         rows.append([total_num, not_null, pct_shown])
@@ -58,7 +59,7 @@ def _summary_table_float(series_map, bins):
                       rowLabels=row_labels,
                       colLabels=column_labels,
                       colWidths = [0.08]*3,
-                      loc='upper right')
+                      loc='upper center')
 
     _make_table_pretty(table)
     plt.show()
