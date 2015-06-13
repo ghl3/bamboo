@@ -29,7 +29,14 @@ def test_boxplot():
 
 @plotting
 def test_hexbin():
-    bamboo.frames.hexbin(df, 'feature1', 'feature2')
+    try:
+        from sklearn.datasets import make_blobs
+    except:
+        assert(False)
+
+    X1, Y1 = make_blobs(n_features=2, centers=3, n_samples=10000)
+    df = pandas.DataFrame(X1, columns=['x', 'y'])
+    bamboo.frames.hexbin(df, 'x', 'y')
 
 @plotting
 def test_hist_df():

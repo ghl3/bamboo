@@ -89,19 +89,18 @@ def test_hist_functions():
 
 @plotting
 def test_scatter():
-
     dfgb = create_test_df_v2().groupby('group')
     scatter(dfgb, 'feature1', 'feature2')
 
+
 @plotting
 def test_stacked_counts_plot():
-
     dfgb = create_test_df_v2().groupby('group')
     stacked_counts_plot(dfgb, 'feature1')
 
+
 @plotting
 def test_stacked_counts_plot_ratio():
-
     dfgb = create_test_df_v2().groupby('group')
     stacked_counts_plot(dfgb, 'feature1', ratio=True)
 

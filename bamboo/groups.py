@@ -236,17 +236,25 @@ def stacked_counts_plot(dfgb, category, ratio=False, **kwargs):
     Optionally, show the ratio of the category in each group.
 
     Convert this:
-    category  group
-    A         1
-    A         1
-    A         2
-    B         1
-    B         2
+    group   category
+    1       A
+    1       A
+    2       A
+    1       B
+    2       B
 
     Into this:
     1: A A B
     2: A B
     as a barplot
+
+    Motivating Example:
+    - group = year
+    - category = product name
+
+    This would then put the years on the
+    x axis and would show a stack of the number
+    of each product sold in that year
     """
 
     counts = dfgb[category].value_counts().unstack().fillna(0.)
