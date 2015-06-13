@@ -9,7 +9,7 @@ from inspect import getmembers, isfunction
 
 from bamboo import groups
 from bamboo import plotting
-
+from bamboo import BambooObjects
 
 # This module defines the core API and handles
 # polymorphic dispatch routing to various
@@ -59,3 +59,6 @@ def _(df, x, y, **kwargs):
 def _(df, x, y, **kwargs):
     return groups.scatter(df, x, y, **kwargs)
 
+
+def wrap(*args, **kwargs):
+    return BambooObjects.wrap(*args, **kwargs)

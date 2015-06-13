@@ -10,6 +10,7 @@ from bamboo.core import head
 from functools import wraps
 from nose.plugins.attrib import attr
 
+
 def assert_equals(obj1, obj2):
 
     print "Object of type {}:\n {}\nShould equal Object of type {}:\n{}\n".format(
