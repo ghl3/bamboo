@@ -75,7 +75,7 @@ def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
     pdf.close()
 
 
-def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, addons=None, *args, **kwargs):
+def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, addons=None, addon_args=None, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -102,7 +102,10 @@ def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, ad
 
     if addons:
         for add_on_func in addons:
-            add_on_func(**plot_result)
+            if addon_args is None:
+                addon_args = {}
+            addon_args.update(plot_result)
+            add_on_func(**addon_args)
 
     plt.legend(loc='best', fancybox=True)
 

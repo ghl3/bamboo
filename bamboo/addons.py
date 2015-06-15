@@ -12,18 +12,19 @@ def summary_table(type, series_map, bins=None, **kwargs):
     """
 
     if type == 'FLOAT':
-        return _create_summary_table(series_map, bins)
+        return _create_summary_table(series_map, bins, **kwargs)
     elif type == 'NOMINAL':
-        return _create_summary_table(series_map)
+        return _create_summary_table(series_map, **kwargs)
     else:
         raise NotImplementedError()
 
 
-def _make_table_pretty(table):
+def _make_table_pretty(table, fontsize=8, height_factor=1.0, width_factor=1.4, **kwargs):
 
     cells = table.properties()['child_artists']
     for cell in cells:
-        cell.set_height(cell.get_height()*1.4)
+        cell.set_height(cell.get_height()*height_factor)
+        cell.set_width(cell.get_width()*width_factor)
 
     row_label_cells = [cell for (x, y), cell in table.properties()['celld'].iteritems()
                        if y==-1]
@@ -32,10 +33,10 @@ def _make_table_pretty(table):
         cell.set_width(cell.get_width()*5)
 
     table.auto_set_font_size(False)
-    table.set_fontsize(8)
+    table.set_fontsize(fontsize)
 
 
-def _create_summary_table(series_map, bins=None):
+def _create_summary_table(series_map, bins=None, **kwargs):
 
     rows = []
     row_labels = []
@@ -61,6 +62,6 @@ def _create_summary_table(series_map, bins=None):
                       colWidths = [0.08]*3,
                       loc='upper center')
 
-    _make_table_pretty(table)
+    _make_table_pretty(table, **kwargs)
 
     return table

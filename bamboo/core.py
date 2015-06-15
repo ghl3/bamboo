@@ -6,7 +6,6 @@ from pandas.core.groupby import SeriesGroupBy
 from singledispatch import singledispatch
 from inspect import getmembers, isfunction
 
-
 from bamboo import groups
 from bamboo import plotting
 from bamboo import BambooObjects
@@ -66,3 +65,6 @@ def wrap(*args, **kwargs):
 
 def hist_all(*args, **kwargs):
     return groups.hist_all(*args, **kwargs)
+
+def save_all(*args, **kwargs):
+    return plotting._save_all(*args, **kwargs)
