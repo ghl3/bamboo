@@ -23,14 +23,14 @@ def _make_table_pretty(table, fontsize=8, height_factor=1.0, width_factor=1.4, *
 
     cells = table.properties()['child_artists']
     for cell in cells:
-        cell.set_height(cell.get_height()*height_factor)
-        cell.set_width(cell.get_width()*width_factor)
+        cell.set_height(cell.get_height() * height_factor)
+        cell.set_width(cell.get_width() * width_factor)
 
     row_label_cells = [cell for (x, y), cell in table.properties()['celld'].iteritems()
-                       if y==-1]
+                       if y == -1]
 
     for cell in row_label_cells:
-        cell.set_width(cell.get_width()*5)
+        cell.set_width(cell.get_width() * 5)
 
     table.auto_set_font_size(False)
     table.set_fontsize(fontsize)
@@ -59,7 +59,7 @@ def _create_summary_table(series_map, bins=None, **kwargs):
     table = plt.table(cellText=rows,
                       rowLabels=row_labels,
                       colLabels=column_labels,
-                      colWidths = [0.08]*3,
+                      colWidths=[0.08] * 3,
                       loc='upper center')
 
     _make_table_pretty(table, **kwargs)

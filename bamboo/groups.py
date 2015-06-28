@@ -16,10 +16,10 @@ import matplotlib.pyplot as plt
 from math import floor, ceil
 
 
-
 """
 Functions that act on data frame group by objects
 """
+
 
 def filter_groups(dfgb, filter_function, on_index=False):
     """
@@ -123,7 +123,7 @@ def pivot_groups(mdfgb, func, **kwargs):
     C      NaN NaN   6
     """
 
-    assert(mdfgb.first().index.nlevels==2)
+    assert(mdfgb.first().index.nlevels == 2)
 
     x, y = mdfgb.first().index.names
 
@@ -131,7 +131,7 @@ def pivot_groups(mdfgb, func, **kwargs):
 
     c = [column for column in mdfgb_applied if column not in (x, y)][0]
 
-    return mdfgb_applied.pivot_table(index=x, columns=y, values=c,  **kwargs)
+    return mdfgb_applied.pivot_table(index=x, columns=y, values=c, **kwargs)
 
 
 def apply_groups(dfgb, *args, **kwargs):
@@ -186,7 +186,7 @@ def hist_functions(dfgb, *args, **kwargs):
     rows = ceil(len(functions) / cols)
 
     for i, function in enumerate(functions):
-        plt.subplot(rows, cols, i+1)
+        plt.subplot(rows, cols, i + 1)
         plotting._series_hist(map_groups(dfgb, function), **kwargs)
         plt.xlabel(function.__name__)
 
@@ -236,7 +236,7 @@ def save_grouped_hists(dfgb, output_file, title=None, *args, **kwargs):
     _save_plots(dfgb, plotting._series_hist, output_file, title, *args, **kwargs)
 
 
-def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12,4), **kwargs):
+def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12, 4), **kwargs):
 
     columns = dfgb.obj.columns
 
@@ -245,7 +245,7 @@ def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12,
         if i % subplot_columns == 0:
             fig = plt.figure(figsize=figsize)
 
-        plt.subplot(1, subplot_columns, (i%subplot_columns) + 1)
+        plt.subplot(1, subplot_columns, (i % subplot_columns) + 1)
         #plt.subplot(x, y, i+1)
         try:
             if binning_map and feature in binning_map:

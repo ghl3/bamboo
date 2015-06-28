@@ -96,7 +96,7 @@ def get_prediction(classifier, features, targets=None, retain_columns=None):
     """
     predictions = classifier.predict(features)
 
-    df_dict = {'predict':predictions}
+    df_dict = {'predict': predictions}
     if targets is not None:
         df_dict[targets.name] = targets
         df_dict['targets'] = targets
@@ -156,7 +156,7 @@ def feature_selection_trees(features, labels):
     Returns a list of the names of the best features (as strings)
     """
     clf = ExtraTreesClassifier(n_estimators=100).fit(features, labels)
-    #clf = clf.fit(features, labels)#.transform(features)
+    # clf = clf.fit(features, labels)#.transform(features)
     importances = [x for x in zip(features.columns, clf.feature_importances_)]
     return sorted(importances, key=lambda x: x[1])
 
@@ -168,6 +168,7 @@ def get_best_features(features, labels, max_to_return=20):
 def feature_importances(importances, features):
     return pd.DataFrame(sorted(zip(features.columns, importances), key=lambda x: -x[1]),
                         columns=['feature', 'value'])
+
 
 def get_importances(features, targets):
     fit = RandomForestClassifier(n_estimators=100).fit(features, targets)
@@ -208,7 +209,7 @@ def get_nominal_integer_dict(nominal_vals):
     for val in nominal_vals:
         if val not in d:
             current_max = max(d.values()) if len(d) > 0 else -1
-            d[val] = current_max+1
+            d[val] = current_max + 1
     return d
 
 
@@ -221,7 +222,7 @@ def convert_strings_to_integer(df):
     ret = pd.DataFrame()
     for column_name in df:
         column = df[column_name]
-        if column.dtype=='string' or column.dtype=='object':
+        if column.dtype == 'string' or column.dtype == 'object':
             ret[column_name] = convert_to_integer(column)
         else:
             ret[column_name] = column

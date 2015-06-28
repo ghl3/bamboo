@@ -3,21 +3,22 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import matplotlib.pyplot as plt
 
+
 class PdfSubplots:
 
-    def __init__(self, pdf, rows, cols, figsize=(30,20)):
+    def __init__(self, pdf, rows, cols, figsize=(30, 20)):
         self.pdf = pdf
         self.rows = rows
         self.cols = cols
         self.idx = -1
-        self.num_subplots = rows*cols
+        self.num_subplots = rows * cols
         self.skip_set = False
         self.figsize = figsize
 
     def next_subplot(self):
 
         if self.skip_set:
-            self.skip_set=False
+            self.skip_set = False
             return
 
         self.idx += 1
@@ -33,16 +34,16 @@ class PdfSubplots:
         self.skip_set = True
 
     def end_iteration(self):
-        if self.idx % self.num_subplots == self.num_subplots-1:
+        if self.idx % self.num_subplots == self.num_subplots - 1:
             plt.tight_layout()
             self.pdf.savefig()
-            #close()
+            # close()
 
     def finalize(self):
-        if self.idx % self.num_subplots != self.num_subplots-1:
+        if self.idx % self.num_subplots != self.num_subplots - 1:
             plt.tight_layout()
             self.pdf.savefig()
-            #close()
+            # close()
 
 
 def print_subplot_info():
@@ -91,7 +92,7 @@ def get_next_subplot(wrap=True):
     row, col = ax.rowNum, ax.colNum
     ax.numRows, ax.numCols
 
-    idx = ax.numCols*row + col + 1
+    idx = ax.numCols * row + col + 1
     next_idx = idx + 1
     plt.subplot(ax.numRows, ax.numCols, next_idx)
 
@@ -100,4 +101,3 @@ def append_to_title(text):
     title = plt.gca().get_title()
     title = title + text
     plt.title(title)
-

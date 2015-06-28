@@ -14,9 +14,9 @@ def combine_data_frames(frames):
     compatable data frames into a single
     data frame (creating a fresh copy, of course)
     """
-    if len(frames)==0:
+    if len(frames) == 0:
         return pd.DataFrame()
-    elif len(frames)==1:
+    elif len(frames) == 1:
         return frames[0]
     else:
         first = frames[0]
@@ -33,9 +33,8 @@ def get_nominal_integer_dict(nominal_vals):
     for val in nominal_vals:
         if val not in d:
             current_max = max(d.values()) if len(d) > 0 else -1
-            d[val] = current_max+1
+            d[val] = current_max + 1
     return d
-
 
 
 def convert_nominal_to_int(srs, return_dict=False):
@@ -44,10 +43,8 @@ def convert_nominal_to_int(srs, return_dict=False):
     into a series of integers
     """
     d = get_nominal_integer_dict(srs)
-    result =  srs.map(lambda x: d[x])
+    result = srs.map(lambda x: d[x])
     if return_dict:
         return (result, d)
     else:
         return result
-
-

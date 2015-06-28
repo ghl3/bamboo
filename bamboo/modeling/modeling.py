@@ -1,6 +1,7 @@
 
 
 class ScoreFeature():
+
     """
     A score created by a classifier using a
     specific set of features.
@@ -19,7 +20,6 @@ class ScoreFeature():
 
     def get_features(self, df):
         return df[self.names]
-
 
     def score(self, features, class_index=1):
         scores = self.clf.predict_proba(self.get_features(features))
@@ -41,4 +41,3 @@ def feature_importances(importances, features):
 def get_importances(features, targets):
     fit = RandomForestClassifier(n_estimators=100).fit(features, targets)
     return feature_importances(fit.feature_importances_, features)
-

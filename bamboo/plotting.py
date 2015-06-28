@@ -67,7 +67,7 @@ def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
             plot_func(series, *args, **kwargs)
             plt.xlabel(var)
             subplots.end_iteration()
-        except :
+        except:
             subplots.skip_subplot()
 
     subplots.finalize()
@@ -75,7 +75,8 @@ def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
     pdf.close()
 
 
-def _series_hist(sgb, ax=None, normed=False, normalize=False, autobin=False, addons=None, addon_args=None, *args, **kwargs):
+def _series_hist(sgb, ax=None, normed=False, normalize=False, autobin=False,
+                 addons=None, addon_args=None, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -118,7 +119,7 @@ def _series_hist_float(sgb, ax=None, autobin=False, normed=False, normalize=Fals
     for each of the groups.
     """
 
-    if ax==None:
+    if ax is None:
         ax = plt.gca()
 
     if 'bins' in kwargs:
@@ -140,7 +141,7 @@ def _series_hist_float(sgb, ax=None, autobin=False, normed=False, normalize=Fals
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        #if len(srs.values)==1 and 'bins' not in kwargs:
+        # if len(srs.values)==1 and 'bins' not in kwargs:
         #    kwargs['bins'] = [srs.values[0] - 0.05, srs.values[0] + 0.05]
 
         srs.hist(ax=ax, color=color, label=str(label), normed=normed, bins=bins, **kwargs)
@@ -156,7 +157,7 @@ def _series_hist_nominal(sgb, ax=None, normalize=False, dropna=False, *args, **k
     for each of the groups.
     """
 
-    if ax==None:
+    if ax is None:
         ax = plt.gca()
 
     color_cycle = ax._get_lines.color_cycle
@@ -248,7 +249,7 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     var_max = max(var)
 
     if var_min == var_max:
-        return np.array([var_min-0.5, var_max+0.5])
+        return np.array([var_min - 0.5, var_max + 0.5])
 
     # If all values are integers (not necessarily by type) between
     # -int_bound and +int_bound, then use unit spacing centered on
@@ -256,7 +257,7 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     if var_min > -int_bound and var_max < int_bound:
 
         if all(np.equal(np.mod(var, 1), 0)):
-            return np.arange(var_min-0.5, var_max+1.5, 1)
+            return np.arange(var_min - 0.5, var_max + 1.5, 1)
 
     # Detect extreme outliers by the following heuristic.
     p_02, p_50, p_98 = np.percentile(var, (2, 50, 98))
@@ -270,6 +271,6 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     if (var_min < p_02_exp):
         var_min = p_02_exp
 
-    bins = np.arange(nbins+1)/nbins * (var_max - var_min) + var_min
+    bins = np.arange(nbins + 1) / nbins * (var_max - var_min) + var_min
 
     return bins

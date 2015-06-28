@@ -8,5 +8,3 @@ def arff_to_df(arff):
 
     # Create the DataFrame
     return pd.DataFrame(rows, columns=attributes)
-
-

@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 Functions that act on data frames
 """
 
+
 def exclude(df, exclude):
     """
     Return a DataFrame with a set of feature excluded
@@ -39,7 +40,7 @@ def split(df, columns, exclude=None):
     columns on the other side
     """
 
-    if exclude==None:
+    if exclude is None:
         exclude = []
 
     left = columns
@@ -57,12 +58,12 @@ def take(df, var, exclude=None):
     on the other side.
     """
 
-    if exclude==None:
+    if exclude is None:
         exclude = []
 
     rest = [column for column in df.columns
-             if column != var
-             and column not in exclude]
+            if column != var
+            and column not in exclude]
 
     return (df[var], df[rest])
 
@@ -79,8 +80,7 @@ def sort_rows(df, key=None):
     if not key:
         return df.sort(inplace=False)
 
-    vals = df.apply(key, axis=1)
-    vals.sort()
+    vals = sorted(df.apply(key, axis=1))
     return df.ix[vals.index]
 
 
@@ -125,7 +125,7 @@ def apply_all(df, *args, **kwargs):
     """
 
     if isinstance(df, pd.DataFrame) and 'axis' not in kwargs:
-        kwargs['axis']=1
+        kwargs['axis'] = 1
 
     res = OrderedDict()
     for idx, arg in enumerate(args):
@@ -157,8 +157,8 @@ def map_functions(df, functions):
             column_map[name] = df.apply(func, axis=1)
     except AttributeError:
             # Assume it's list like
-            for func in functions:
-                column_map[func.__name__] = df.apply(func, axis=1)
+        for func in functions:
+            column_map[func.__name__] = df.apply(func, axis=1)
 
     return pd.DataFrame(column_map, index=df.index)
 
@@ -212,7 +212,7 @@ def group_by_binning(df, column, bins):
 
     def grouper(x):
         for i in range(len(bins[:-1])):
-            left, right = bins[i], bins[i+1]
+            left, right = bins[i], bins[i + 1]
             if x >= left and x < right:
                 return "({}, {})".format(left, right)
         return None
@@ -258,6 +258,7 @@ def boxplot(df, x, y, bins=None):
 
 def hist(df, *args, **kwargs):
     return df.hist(*args, **kwargs)
+
 
 def scatter(df, *args, **kwargs):
     return plotting._frame_scatter(*args, **kwargs)

@@ -5,13 +5,16 @@ from pandas.core.groupby import GroupBy
 
 from inspect import getmembers, isfunction, ismethod
 
-import core, groups, frames, plotting
+import core
+import groups
+import frames
+import plotting
 
 
-_bamboo_methods = {name:func for name, func in getmembers(core) if isfunction(func)}
-_frames_methods = {name:func for name, func in getmembers(frames) if isfunction(func)}
-_groups_methods = {name:func for name, func in getmembers(groups) if isfunction(func)}
-_plot_methods = {} #{name:func  for name, func in getmembers(plotting) if isfunction(func)}
+_bamboo_methods = {name: func for name, func in getmembers(core) if isfunction(func)}
+_frames_methods = {name: func for name, func in getmembers(frames) if isfunction(func)}
+_groups_methods = {name: func for name, func in getmembers(groups) if isfunction(func)}
+_plot_methods = {}  # {name:func  for name, func in getmembers(plotting) if isfunction(func)}
 
 
 def _wrap_with_bamboo(obj):
@@ -36,7 +39,7 @@ def wrap(obj):
 def _create_bamboo_wrapper(obj, func):
     def callable(*args, **kwargs):
         res = func(obj, *args, **kwargs)
-        ret =  _wrap_with_bamboo(res)
+        ret = _wrap_with_bamboo(res)
         return ret
     return callable
 
@@ -44,7 +47,7 @@ def _create_bamboo_wrapper(obj, func):
 def _wrap_instance_method(method):
     def wrapped_method(*args, **kwargs):
         res = method.__call__(*args, **kwargs)
-        ret =  _wrap_with_bamboo(res)
+        ret = _wrap_with_bamboo(res)
         return ret
     return wrapped_method
 
@@ -54,10 +57,8 @@ class BambooDataFrame(pandas.DataFrame):
     def __init__(self, *args, **kwargs):
         super(BambooDataFrame, self).__init__(*args, **kwargs)
 
-
     def groupby(self, *args, **kwargs):
         return _wrap_with_bamboo(super(BambooDataFrame, self).groupby(*args, **kwargs))
-
 
     def __getattribute__(self, *args, **kwargs):
         val = super(BambooDataFrame, self).__getattribute__(*args, **kwargs)
@@ -67,7 +68,6 @@ class BambooDataFrame(pandas.DataFrame):
             return _wrap_instance_method(val)
         else:
             return val
-
 
     def __getattr__(self, *args, **kwargs):
 
@@ -93,26 +93,23 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
             raise TypeError()
 
         super(BambooDataFrameGroupBy, self).__init__(
-                                             other.obj,
-                                             other.keys,
-                                             other.axis,
-                                             other.level,
-                                             other.grouper,
-                                             other.exclusions,
-                                             other._selection,
-                                             other.as_index,
-                                             other.sort,
-                                             other.group_keys,
-                                             other.squeeze)
-
+            other.obj,
+            other.keys,
+            other.axis,
+            other.level,
+            other.grouper,
+            other.exclusions,
+            other._selection,
+            other.as_index,
+            other.sort,
+            other.group_keys,
+            other.squeeze)
 
     def head(self, *args, **kwargs):
         return bamboo.head(self, *args, **kwargs)
 
-
     def hist(self, *args, **kwargs):
         return plotting._frame_hist(self, *args, **kwargs)
-
 
     def __getattribute__(self, *args, **kwargs):
         val = super(BambooDataFrameGroupBy, self).__getattribute__(*args, **kwargs)
@@ -122,7 +119,6 @@ class BambooDataFrameGroupBy(pandas.core.groupby.DataFrameGroupBy):
             return _wrap_instance_method(val)
         else:
             return val
-
 
     def __getattr__(self, *args, **kwargs):
 
@@ -147,26 +143,23 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
         if not isinstance(other, pandas.core.groupby.SeriesGroupBy):
             raise TypeError()
         super(BambooSeriesGroupBy, self).__init__(
-                                             other.obj,
-                                             other.keys,
-                                             other.axis,
-                                             other.level,
-                                             other.grouper,
-                                             other.exclusions,
-                                             other._selection,
-                                             other.as_index,
-                                             other.sort,
-                                             other.group_keys,
-                                             other.squeeze)
-
+            other.obj,
+            other.keys,
+            other.axis,
+            other.level,
+            other.grouper,
+            other.exclusions,
+            other._selection,
+            other.as_index,
+            other.sort,
+            other.group_keys,
+            other.squeeze)
 
     def head(self, *args, **kwargs):
         return bamboo.head(self, *args, **kwargs)
 
-
     def hist(self, *args, **kwargs):
         return plotting._series_hist(self, *args, **kwargs)
-
 
     def __getattribute__(self, *args, **kwargs):
         val = super(BambooSeriesGroupBy, self).__getattribute__(*args, **kwargs)
@@ -176,7 +169,6 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
             return _wrap_instance_method(val)
         else:
             return val
-
 
     def __getattr__(self, *args, **kwargs):
 
@@ -191,6 +183,6 @@ class BambooSeriesGroupBy(pandas.core.groupby.SeriesGroupBy):
         if name in _groups_methods:
             return _create_bamboo_wrapper(self, _groups_methods[name])
 
-        #return _wrap_instance_method(super(BambooSeriesGroupBy, self).__getattr__(*args, **kwargs))
+        # return _wrap_instance_method(super(BambooSeriesGroupBy, self).__getattr__(*args, **kwargs))
         res = super(BambooSeriesGroupBy, self).__getattr__(*args, **kwargs)
         return _wrap_with_bamboo(res)

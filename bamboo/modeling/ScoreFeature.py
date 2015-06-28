@@ -3,6 +3,7 @@ import pandas as pd
 
 
 class ScoreFeature():
+
     """
     A score created by a classifier using a
     specific set of features.

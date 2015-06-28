@@ -17,6 +17,7 @@ from bamboo import BambooObjects
 # polymorphic dispatch routing to various
 # functions throughout the bamboo code
 
+
 @singledispatch
 def head(df, n=5):
     """
@@ -37,6 +38,7 @@ def hist(df, *args, **kwargs):
     pass
 #    return df.hist(*args, **kwargs)
 
+
 @hist.register(DataFrame)
 def _(df, *args, **kwargs):
     return frames.hist(df, *args, **kwargs)
@@ -49,7 +51,7 @@ def _(sgb, *args, **kwargs):
 
 @hist.register(DataFrameGroupBy)
 def _(dfgb, *args, **kwargs):
-    return groups.hist(dfgb, *args, **kwargs) #plotting._frame_hist(sgb, *args, **kwargs)
+    return groups.hist(dfgb, *args, **kwargs)  # plotting._frame_hist(sgb, *args, **kwargs)
 
 
 @singledispatch
@@ -59,12 +61,12 @@ def scatter(df, x, y, **kwargs):
 
 @scatter.register(DataFrame)
 def _(df, x, y, **kwargs):
-    return frames.scatter(df, x, y, **kwargs) # plotting._frame_scatterscatter(df, x, y, **kwargs)
+    return frames.scatter(df, x, y, **kwargs)  # plotting._frame_scatterscatter(df, x, y, **kwargs)
 
 
 @scatter.register(DataFrameGroupBy)
 def _(dfgb, x, y, **kwargs):
-    return groups.scatter(dfgb, x, y, **kwargs) # plotting._groups_scatter(df, x, y, **kwargs)
+    return groups.scatter(dfgb, x, y, **kwargs)  # plotting._groups_scatter(df, x, y, **kwargs)
 
 
 def wrap(*args, **kwargs):
@@ -73,6 +75,7 @@ def wrap(*args, **kwargs):
 
 def hist_all(*args, **kwargs):
     return groups.hist_all(*args, **kwargs)
+
 
 def save_all(*args, **kwargs):
     return plotting._save_all(*args, **kwargs)
