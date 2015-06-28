@@ -5,9 +5,9 @@ import pandas as pd
 from helpers import NUMERIC_TYPES, convert_nominal_to_int
 
 from collections import OrderedDict
-
-
 import matplotlib.pyplot as plt
+
+from bamboo import plotting
 
 """
 Functions that act on data frames
@@ -80,9 +80,8 @@ def sort_rows(df, key=None):
     if not key:
         return df.sort(inplace=False)
 
-    vals = sorted(df.apply(key, axis=1))
-    return df.ix[vals.index]
-
+    indices = df.apply(key, axis=1).sort(inplace=False).index
+    return df.ix[indices]
 
 def sort_columns(df, key, by_name=False):
     """
@@ -104,11 +103,12 @@ def sort_columns(df, key, by_name=False):
             val = key(colname)
         else:
             val = key(df[colname])
+
         items.append((idx, val))
 
     items.sort(key=lambda x: x[1])
 
-    return df.icol([idx for idx, val in items])
+    return df.icol([idx for idx, _ in items])
 
 
 def apply_all(df, *args, **kwargs):

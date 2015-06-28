@@ -2,18 +2,17 @@ from __future__ import division
 
 from collections import OrderedDict
 
-from singledispatch import singledispatch
+#from singledispatch import singledispatch
 
 import pandas as pd
 
 from bamboo import plotting
 from helpers import combine_data_frames
 
-from types import *
-import inspect
+#import inspect
 
 import matplotlib.pyplot as plt
-from math import floor, ceil
+from math import ceil
 
 
 """
@@ -233,7 +232,7 @@ def stacked_counts_plot(dfgb, category, ratio=False, **kwargs):
 
 
 def save_grouped_hists(dfgb, output_file, title=None, *args, **kwargs):
-    _save_plots(dfgb, plotting._series_hist, output_file, title, *args, **kwargs)
+    plotting._save_plots(dfgb, plotting._series_hist, output_file, title, *args, **kwargs)
 
 
 def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12, 4), **kwargs):
@@ -249,7 +248,7 @@ def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12,
         #plt.subplot(x, y, i+1)
         try:
             if binning_map and feature in binning_map:
-                plotting._grouped_hist(dfgb, feature, bins=bins, **kwargs)
+                plotting._grouped_hist(dfgb, feature, bins=binning_map[feature], **kwargs)
             else:
                 plotting._grouped_hist(dfgb, feature, autobin=True, **kwargs)
         except Exception as e:

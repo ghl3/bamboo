@@ -2,10 +2,11 @@
 import numpy as np
 import pandas
 
-from bamboo.frames import *
+from bamboo import frames
 
 from helpers import *
 
+from numpy.testing import assert_array_equal
 
 group = [0, 0, 0, 0,
          1, 1,
@@ -24,19 +25,19 @@ df = pandas.DataFrame({'group':group,
                        'feature2':feature2})
 
 def test_exclude():
-    exclude(df, [0])
+    frames.exclude(df, [0])
 
 
 def test_partition():
-    partition(df, lambda x: x['feature1'] > 1)
+    frames.partition(df, lambda x: x['feature1'] > 1)
 
 
 def test_split():
-    split(df, ['feature1'])
+    frames.split(df, ['feature1'])
 
 
 def test_take():
-    take(df, ['feature1'])
+    frames.take(df, ['feature1'])
 
 
 def test_apply_all():
@@ -44,51 +45,52 @@ def test_apply_all():
     def sum(x):
         return x.sum()
 
-    print apply_all(df, sum)
+    print frames.apply_all(df, sum)
 
 
 def test_sort_rows():
 
     df = create_test_df_v2()
-    sort_rows(df, lambda x: x.mean())
+    sorted = frames.sort_rows(df, lambda x: x.mean())
+    assert_array_equal(sorted.index, [6,8, 9, 2, 0, 1, 3, 4, 5, 10, 11, 7])
 
 
 def test_sort_columns():
 
     df = create_test_df_v2()
-    sort_columns(df, lambda x: x.mean())
+    frames.sort_columns(df, lambda x: x.mean())
 
 
 def test_map_functions():
 
     df = create_test_df_v2()
-    map_functions(df, [lambda x: x.feature1, lambda x: x.feature1 + x.feature2])
+    frames.map_functions(df, [lambda x: x.feature1, lambda x: x.feature1 + x.feature2])
 
 
 def test_with_new_columns():
 
     df = create_test_df_v2()
-    with_new_columns(df, [lambda x: x.feature1 + x.feature2])
+    frames.with_new_columns(df, [lambda x: x.feature1 + x.feature2])
 
 def test_get_numeric_features():
 
     df = create_test_df_v3()
-    get_numeric_features(df)
+    frames.get_numeric_features(df)
 
 
 def test_convert_nonminals_to_int():
 
     df = create_test_df_v3()
-    convert_nominals_to_int(df)
+    frames.convert_nominals_to_int(df)
 
 
 def test_get_index_rows():
 
     df = create_test_df_v2()
-    get_index_rows(df, [0, 2, 4])
+    frames.get_index_rows(df, [0, 2, 4])
 
 
 def test_group_by_binning():
 
     df = create_test_df_v2()
-    group_by_binning(df, 'feature2', np.arange(0, 20, 10))
+    frames.group_by_binning(df, 'feature2', np.arange(0, 20, 10))

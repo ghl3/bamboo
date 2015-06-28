@@ -1,27 +1,20 @@
 
 import numpy as np
-
 import pandas as pd
-from pandas import DataFrame
 
 from bamboo import frames
 
-from sklearn.metrics import classification_report
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
-from sklearn.metrics import f1_score, fbeta_score
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 
 from sklearn.externals.six import StringIO
 import pydot
 from sklearn import tree
 
 from sklearn.cross_validation import StratifiedKFold
-from sklearn.metrics import roc_curve, auc
-
-from random import sample
 
 from bamboo.helpers import NUMERIC_TYPES
 

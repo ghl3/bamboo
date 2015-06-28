@@ -164,7 +164,7 @@ class ModelingData():
         for i, feature in enumerate(self.features.columns):
             plt.subplot(x, y, i + 1)
             if binning_map and feature in binning_map:
-                self.hist(feature, bins=bins, **kwargs)
+                self.hist(feature, bins=binning_map[feature], **kwargs)
             else:
                 self.hist(feature, autobin=True, **kwargs)
             plt.xlabel(feature)
@@ -187,7 +187,7 @@ class ModelingData():
         return ModelingData(self.features[numeric_feature_names], self.targets)
 
     def plot_auc_surve(self, clf):
-        return plotting.plot_auc_curve(clf, self.features, self.targets)
+        return bamboo.plotting.plot_auc_curve(clf, self.features, self.targets)
 
     def predict_proba(self, clf):
 
@@ -230,8 +230,8 @@ class ModelingData():
         reduced = probabilities[[target_name, 'target']]
         return bamboo.plotting._series_hist(reduced.groupby('target')[target_name], **kwargs)
 
-    def _cross_validate_score(self, clf, fit=False, **kwargs):
-        return cross_validation.cross_val - score(clf, self.features, self.targets, **kwargs)
+    #def _cross_validate_score(self, clf, fit=False, **kwargs):
+    #    return cross_validation.cross_val - score(clf, self.features, self.targets, **kwargs)
 
     def get_classifier_performance_summary(self, clf, target, thresholds=np.arange(0.0, 1.01, 0.01), **kwargs):
         """
@@ -304,6 +304,8 @@ class ModelingData():
 
         return {'threshold': threshold,
                 'target': target,
+                'num_positives': num_positives,
+                'num_negatives': num_negatives,
                 'true_positives': num_true_positives,
                 'false_positives': num_false_positives,
                 'true_negatives': num_true_negatives,

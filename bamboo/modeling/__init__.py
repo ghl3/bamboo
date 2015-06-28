@@ -1,3 +1,3 @@
 
 
-from ModelingData import ModelingData
+__all__ = ['modeling']

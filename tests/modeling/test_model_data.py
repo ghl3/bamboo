@@ -7,6 +7,8 @@ from bamboo.core import *
 from bamboo.helpers import *
 import bamboo.modeling
 
+from bamboo.modeling.ModelingData import ModelingData
+
 from pandas.util.testing import assert_frame_equal
 
 from numpy.random import RandomState
@@ -15,6 +17,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import LinearRegression
 
 from nose.tools import assert_dict_equal
+
+
+assert_equal.__self__.maxDiff = None
 
 group = [0, 0, 0, 0,
          1, 1, 1, 1,
@@ -48,7 +53,7 @@ def test_split():
 
     random_state = RandomState(12345)
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
+    data = ModelingData.from_dataframe(df, target='group')
 
     train, test = data.train_test_split(random_state=random_state)
 
@@ -62,7 +67,7 @@ def test_split():
 
 def test_balance_truncation():
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
+    data = ModelingData.from_dataframe(df, target='group')
 
     eq_(len(data), 12)
 
@@ -82,7 +87,7 @@ def test_balance_truncation():
 
 def test_balance_sample():
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
+    data = ModelingData.from_dataframe(df, target='group')
 
     eq_(len(data), 12)
 
@@ -103,9 +108,9 @@ def test_balance_sample():
 
 def test_orthogonal():
 
-    dataA = bamboo.modeling.ModelingData.from_dataframe(df.iloc[0:6], target='group')
-    dataB = bamboo.modeling.ModelingData.from_dataframe(df.iloc[3:9], target='group')
-    dataC = bamboo.modeling.ModelingData.from_dataframe(df.iloc[6:12], target='group')
+    dataA = ModelingData.from_dataframe(df.iloc[0:6], target='group')
+    dataB = ModelingData.from_dataframe(df.iloc[3:9], target='group')
+    dataC = ModelingData.from_dataframe(df.iloc[6:12], target='group')
 
     assert(dataA.is_orthogonal(dataC))
     assert(not dataA.is_orthogonal(dataB))
@@ -114,7 +119,7 @@ def test_orthogonal():
 
 def test_numeric_features():
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df2, target='group')
+    data = ModelingData.from_dataframe(df2, target='group')
 
     eq_(data.shape(), (12,3))
     assert('feature3' in data.features.columns)
@@ -129,7 +134,7 @@ def test_probas():
 
     clf = LogisticRegression()
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
+    data = ModelingData.from_dataframe(df, target='group')
 
     data.fit(clf)
 
@@ -142,7 +147,7 @@ def test_predict():
 
     reg = LinearRegression()
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
+    data = ModelingData.from_dataframe(df, target='group')
 
     data.fit(reg)
 
@@ -156,23 +161,30 @@ def test_summary():
 
     clf = LogisticRegression()
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
+    data = ModelingData.from_dataframe(df, target='group')
     data.fit(clf)
 
     probas = data.predict_proba(clf)
-    summary = bamboo.modeling.ModelingData.get_threshold_summary(probas, 1)
+    summary = ModelingData.get_threshold_summary(probas, 1)
 
-    assert_dict_equal(dict(summary), {'sensiticity': 1.0, 'target': 1, 'f1': 1.0, 'recall': 1.0, 'false_positive_rate': 0.0, 'false_positives': 0, 'precision': 1.0, 'true_positives': 5, 'false_negatives': 0, 'true_positive_rate': 1.0, 'specificity': 1.0, 'threshold': 0.5, 'true_negatives': 7, 'accuracy': 1.0})
+    assert_dict_equal(dict(summary), {'sensiticity': 1.0, 'target': 1, 'f1': 1.0, 'recall': 1.0, 'num_negatives': 7,
+                                      'num_positives': 5, 'false_positive_rate': 0.0, 'false_positives': 0, 'precision': 1.0,
+                                      'true_positives': 5, 'false_negatives': 0, 'true_positive_rate': 1.0, 'specificity': 1.0,
+                                      'threshold': 0.5, 'true_negatives': 7, 'accuracy': 1.0})
 
 
 def test_classifier_performance_summary():
 
     clf = LogisticRegression()
 
-    data = bamboo.modeling.ModelingData.from_dataframe(df, target='group')
+    data = ModelingData.from_dataframe(df, target='group')
     data.fit(clf)
 
     probas, summary = data.get_classifier_performance_summary(clf, 0, thresholds=np.arange(0.0, 1.0, 0.1))
 
-    assert_dict_equal(dict(summary.irow(0)), {'f1': 0.73684210526315785, 'target': 0.0, 'sensiticity': 1.0, 'recall': 1.0, 'false_positive_rate': 1.0, 'false_positives': 5.0, 'precision': 0.58333333333333337, 'true_positives': 7.0, 'false_negatives': 0.0, 'true_positive_rate': 1.0, 'specificity': 0.0, 'true_negatives': 0.0, 'accuracy': 0.58333333333333337})
+    assert_dict_equal(dict(summary.irow(0)), {'f1': 0.7368421052631579, 'target': 0.0, 'sensiticity': 1.0, 'recall': 1.0,
+                                              'num_negatives': 0.0, 'num_positives': 12.0, 'false_positive_rate': 1.0,
+                                              'false_positives': 5.0, 'precision': 0.58333333333333337, 'true_positives': 7.0,
+                                              'false_negatives': 0.0, 'true_positive_rate': 1.0, 'specificity': 0.0,
+                                              'true_negatives': 0.0, 'accuracy': 0.58333333333333337})
 

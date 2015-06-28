@@ -1,19 +1,11 @@
 from __future__ import division
 
-import math
-
 import pandas as pd
-from pandas import DataFrame
-
 import matplotlib.pyplot as plt
-from math import floor, ceil
-
 import numpy as np
 
 from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
-
-from frames import group_by_binning
 
 from helpers import NUMERIC_TYPES
 
@@ -46,7 +38,7 @@ def _draw_stacked_plot(dfgb, **kwargs):
     df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
 
 
-def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
+def _save_plots(dfgb, plot_func, output_file, *args, **kwargs):
     """
     Take a grouped dataframe and save a pdf of
     the histogrammed variables in that dataframe.
@@ -54,9 +46,6 @@ def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
     """
 
     pdf = PdfPages(output_file)
-
-    if title:
-        helpers.title_page(pdf, title)
 
     subplots = PdfSubplots(pdf, 3, 3)
 
