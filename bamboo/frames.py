@@ -254,3 +254,10 @@ def boxplot(df, x, y, bins=None):
         boxplot_frame_groupby(df.groupby(x)[y], subplots=False, return_type='dict')
     else:
         boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False, return_type='dict')
+
+
+def hist(df, *args, **kwargs):
+    return df.hist(*args, **kwargs)
+
+def scatter(df, *args, **kwargs):
+    return plotting._frame_scatter(*args, **kwargs)

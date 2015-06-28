@@ -158,6 +158,14 @@ def apply_groups(dfgb, *args, **kwargs):
 #
 
 
+def hist(dfgb, *args, **kwargs):
+    return plotting._grouped_hist(dfgb, *args, **kwargs)
+
+
+def scatter(dfgb, *args, **kwargs):
+    return plotting._grouped_scatter(dfgb, *args, **kwargs)
+
+
 def hist_functions(dfgb, *args, **kwargs):
     """
     Take a DataFrameGroupBy and a list of functions and make a
@@ -241,9 +249,9 @@ def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12,
         #plt.subplot(x, y, i+1)
         try:
             if binning_map and feature in binning_map:
-                plotting._frame_hist(dfgb, feature, bins=bins, **kwargs)
+                plotting._grouped_hist(dfgb, feature, bins=bins, **kwargs)
             else:
-                plotting._frame_hist(dfgb, feature, autobin=True, **kwargs)
+                plotting._grouped_hist(dfgb, feature, autobin=True, **kwargs)
         except Exception as e:
             print e
         plt.xlabel(feature)

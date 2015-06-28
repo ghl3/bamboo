@@ -75,7 +75,7 @@ def _save_plots(dfgb, plot_func, output_file, title=None, *args, **kwargs):
     pdf.close()
 
 
-def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, addons=None, addon_args=None, *args, **kwargs):
+def _series_hist(sgb, ax=None, normed=False, normalize=False, autobin=False, addons=None, addon_args=None, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -92,13 +92,13 @@ def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, ad
 
     normed_or_normalize = normed or normalize
 
-    if dfgb.obj.dtype in NUMERIC_TYPES:
-        plot_result = _series_hist_float(dfgb, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
+    if sgb.obj.dtype in NUMERIC_TYPES:
+        plot_result = _series_hist_float(sgb, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
     else:
-        plot_result = _series_hist_nominal(dfgb, ax, normalize=normed_or_normalize, *args, **kwargs)
+        plot_result = _series_hist_nominal(sgb, ax, normalize=normed_or_normalize, *args, **kwargs)
 
-    if dfgb.obj.name:
-        plt.xlabel(dfgb.obj.name)
+    if sgb.obj.name:
+        plt.xlabel(sgb.obj.name)
 
     if addons:
         for add_on_func in addons:
@@ -110,7 +110,7 @@ def _series_hist(dfgb, ax=None, normed=False, normalize=False, autobin=False, ad
     plt.legend(loc='best', fancybox=True)
 
 
-def _series_hist_float(dfgb, ax=None, autobin=False, normed=False, normalize=False,
+def _series_hist_float(sgb, ax=None, autobin=False, normed=False, normalize=False,
                        stacked=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
@@ -124,13 +124,13 @@ def _series_hist_float(dfgb, ax=None, autobin=False, normed=False, normalize=Fal
     if 'bins' in kwargs:
         bins = kwargs.pop('bins')
     else:
-        bins = _get_variable_binning(dfgb.obj)
+        bins = _get_variable_binning(sgb.obj)
 
     color_cycle = itertools.cycle(ax._get_lines.color_cycle)
 
     series_map = {}
 
-    for (color, (key, srs)) in zip(color_cycle, dfgb):
+    for (color, (key, srs)) in zip(color_cycle, sgb):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
@@ -146,10 +146,10 @@ def _series_hist_float(dfgb, ax=None, autobin=False, normed=False, normalize=Fal
         srs.hist(ax=ax, color=color, label=str(label), normed=normed, bins=bins, **kwargs)
         series_map[label] = srs
 
-    return {'type': 'FLOAT', 'grouped': dfgb, 'series_map': series_map, 'bins': bins}
+    return {'type': 'FLOAT', 'grouped': sgb, 'series_map': series_map, 'bins': bins}
 
 
-def _series_hist_nominal(dfgb, ax=None, normalize=False, dropna=False, *args, **kwargs):
+def _series_hist_nominal(sgb, ax=None, normalize=False, dropna=False, *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -162,13 +162,13 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, dropna=False, *args, **
     color_cycle = ax._get_lines.color_cycle
 
     if dropna:
-        vals = [val for val in set(dfgb.obj.values) if val is not None]
+        vals = [val for val in set(sgb.obj.values) if val is not None]
     else:
-        vals = [val for val in set(dfgb.obj.values)]
+        vals = [val for val in set(sgb.obj.values)]
 
     series_map = {}
 
-    for (color, (key, srs)) in zip(color_cycle, dfgb):
+    for (color, (key, srs)) in zip(color_cycle, sgb):
 
         if 'label' in kwargs.keys():
             label = kwargs['label']
@@ -182,10 +182,10 @@ def _series_hist_nominal(dfgb, ax=None, normalize=False, dropna=False, *args, **
         value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
         series_map[label] = srs
 
-    return {'type': 'NOMINAL', 'grouped': dfgb, 'series_map': series_map}
+    return {'type': 'NOMINAL', 'grouped': sgb, 'series_map': series_map}
 
 
-def _frame_hist(dfgb, var=None, *args, **kwargs):
+def _grouped_hist(dfgb, var=None, *args, **kwargs):
 
     if var is not None:
         _series_hist(dfgb[var], *args, **kwargs)
@@ -200,7 +200,19 @@ def _frame_hist(dfgb, var=None, *args, **kwargs):
                 print e
 
 
-def _groups_scatter(dfgb, x, y, **kwargs):
+def _frame_scatter(df, x, y, **kwargs):
+    """
+    Takes a grouped data frame and draws a scatter
+    plot of the suppied variables wtih a different
+    color for each group
+    """
+    ax = plt.gca()
+    plt.scatter(df[x], df[y], **kwargs)
+    plt.xlabel(x)
+    plt.ylabel(y)
+
+
+def _grouped_scatter(dfgb, x, y, **kwargs):
     """
     Takes a grouped data frame and draws a scatter
     plot of the suppied variables wtih a different
@@ -211,18 +223,6 @@ def _groups_scatter(dfgb, x, y, **kwargs):
     for (color, (key, grp)) in zip(color_cycle, dfgb):
         plt.scatter(grp[x], grp[y], color=color, label=key, **kwargs)
     plt.legend(loc='best')
-    plt.xlabel(x)
-    plt.ylabel(y)
-
-
-def _frames_scatter(df, x, y, **kwargs):
-    """
-    Takes a grouped data frame and draws a scatter
-    plot of the suppied variables wtih a different
-    color for each group
-    """
-    ax = plt.gca()
-    plt.scatter(df[x], df[y], **kwargs)
     plt.xlabel(x)
     plt.ylabel(y)
 
@@ -273,5 +273,3 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     bins = np.arange(nbins+1)/nbins * (var_max - var_min) + var_min
 
     return bins
-
-

@@ -6,7 +6,10 @@ from pandas.core.groupby import SeriesGroupBy
 from singledispatch import singledispatch
 from inspect import getmembers, isfunction
 
+from bamboo import frames
 from bamboo import groups
+from bamboo import series_groups
+
 from bamboo import plotting
 from bamboo import BambooObjects
 
@@ -31,17 +34,22 @@ def _(dfgb, n=5, ngroups=5):
 
 @singledispatch
 def hist(df, *args, **kwargs):
-    return df.hist(*args, **kwargs)
+    pass
+#    return df.hist(*args, **kwargs)
+
+@hist.register(DataFrame)
+def _(df, *args, **kwargs):
+    return frames.hist(df, *args, **kwargs)
 
 
 @hist.register(SeriesGroupBy)
 def _(sgb, *args, **kwargs):
-    plotting._series_hist(sgb, *args, **kwargs)
+    return series_groups.hist(sgb, *args, **kwargs)
 
 
 @hist.register(DataFrameGroupBy)
-def _(sgb, *args, **kwargs):
-    plotting._frame_hist(sgb, *args, **kwargs)
+def _(dfgb, *args, **kwargs):
+    return groups.hist(dfgb, *args, **kwargs) #plotting._frame_hist(sgb, *args, **kwargs)
 
 
 @singledispatch
@@ -51,12 +59,12 @@ def scatter(df, x, y, **kwargs):
 
 @scatter.register(DataFrame)
 def _(df, x, y, **kwargs):
-    return plotting._frame_scatterscatter(df, x, y, **kwargs)
+    return frames.scatter(df, x, y, **kwargs) # plotting._frame_scatterscatter(df, x, y, **kwargs)
 
 
-@scatter.register(GroupBy)
-def _(df, x, y, **kwargs):
-    return plotting._groups_scatter(df, x, y, **kwargs)
+@scatter.register(DataFrameGroupBy)
+def _(dfgb, x, y, **kwargs):
+    return groups.scatter(dfgb, x, y, **kwargs) # plotting._groups_scatter(df, x, y, **kwargs)
 
 
 def wrap(*args, **kwargs):

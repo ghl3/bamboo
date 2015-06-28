@@ -91,7 +91,7 @@ def test_hist_functions():
 @plotting
 def test_scatter():
     dfgb = create_test_df_v2().groupby('group')
-    bamboo.plotting._groups_scatter(dfgb, 'feature1', 'feature2')
+    bamboo.plotting._grouped_scatter(dfgb, 'feature1', 'feature2')
 
 
 @plotting
