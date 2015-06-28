@@ -7,6 +7,7 @@ from bamboo import frames
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
+from sklearn import cross_validation
 
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 
@@ -188,7 +189,7 @@ def get_floating_feature_names(df):
 
 def get_floating_point_features(df, remove_na=True):
 
-    float_feature_names = get_Floating_feature_names(df)
+    float_feature_names = get_floating_feature_names(df)
     float_features = df[float_feature_names]
 
     if remove_na:

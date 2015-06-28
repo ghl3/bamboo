@@ -9,6 +9,7 @@ from tools import get_scores
 
 import bamboo
 
+
 class ScoreFeature():
 
     """

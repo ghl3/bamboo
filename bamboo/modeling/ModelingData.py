@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 from sklearn.preprocessing._weights import _balance_weights as balance_weights
 from sklearn.cross_validation import ShuffleSplit
-from sklearn import cross_validation
 
 from bamboo.helpers import NUMERIC_TYPES
 import bamboo.plotting
@@ -230,7 +229,7 @@ class ModelingData():
         reduced = probabilities[[target_name, 'target']]
         return bamboo.plotting._series_hist(reduced.groupby('target')[target_name], **kwargs)
 
-    #def _cross_validate_score(self, clf, fit=False, **kwargs):
+    # def _cross_validate_score(self, clf, fit=False, **kwargs):
     #    return cross_validation.cross_val - score(clf, self.features, self.targets, **kwargs)
 
     def get_classifier_performance_summary(self, clf, target, thresholds=np.arange(0.0, 1.01, 0.01), **kwargs):

@@ -83,6 +83,7 @@ def sort_rows(df, key=None):
     indices = df.apply(key, axis=1).sort(inplace=False).index
     return df.ix[indices]
 
+
 def sort_columns(df, key, by_name=False):
     """
     Sort the columns of a DataFrame by the given key function

@@ -2,14 +2,10 @@ from __future__ import division
 
 from collections import OrderedDict
 
-#from singledispatch import singledispatch
-
 import pandas as pd
 
 from bamboo import plotting
 from helpers import combine_data_frames
-
-#import inspect
 
 import matplotlib.pyplot as plt
 from math import ceil
@@ -245,7 +241,7 @@ def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12,
             fig = plt.figure(figsize=figsize)
 
         plt.subplot(1, subplot_columns, (i % subplot_columns) + 1)
-        #plt.subplot(x, y, i+1)
+
         try:
             if binning_map and feature in binning_map:
                 plotting._grouped_hist(dfgb, feature, bins=binning_map[feature], **kwargs)
