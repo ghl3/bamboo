@@ -84,22 +84,19 @@ Bamboo functions are meant to be composable.  So, let's say that I want to group
 
 While this works, composing functions like this can make them become less and less readable (and makes it harder to write).
 
-Fortunately, bamboo exposes a solution to this.  Bamboo uses subclasses of common Pandas classes that have many of bamboo's helper functions available as methods.  One can create these classes by wrapping a Pandas object with the 'wrap' function:
+Pandas' new `pipe` operator makes this type of composition easier (note that this only works in the master branch of pandas until 16.3 is released).  Now, one can write the following:
 
-    from bamboo import wrap
-
-    wrap(df) \
-        .groupby('group') \
-        .filter_groups(lambda x: x['feature1'].mean() > 0) \
-        .sorted_groups(lambda x: x['feature2'].mean())
+   df \
+     .groupby('group') \
+     .pipe(filter_groups, lambda x: x['feature1'].mean() > 0)
+     .pipe(sorted_groups, lambda x: x['feature2'].mean())
 
  Notice that the result of each transformation is automatically passed to the next transformation.  This allows one to do more complicated transformations by chaining methods in succession:
 
-
-    wrap(df).groupby('group') \
-        .filter_groups(lambda x: x['group'].mean() > 0) \
-        .sorted_groups(lambda x: x['feature2'].mean()) \
-        .map_groups(lambda x: x['feature1'].mean()) \
+    df.groupby('group') \
+        .pipe(filter_groups, lambda x: x['group'].mean() > 0) \
+        .pipe(sorted_groups, lambda x: x['feature2'].mean()) \
+        .pipe(map_groups, lambda x: x['feature1'].mean()) \
         .sum()
 
 Let's describe what's going here for the sake of completeness.  We start by taking a normal Pandas DataFrame and convert it into a BambooDataFrame using 'wrap'.  This allows us to do in line processing on it.  We group it by the 'group' column, turning it into a DataFrameGroupBy.  Next, we apply a filter that requires that all remaining groups have a mean of their group column greater than 0.  We then sort the groups, ordering them by the mean of their 'feature2' column.  Then, we map a function over each row in each group, taking the mean of 'feature2'.  This turns the underlying object from a multi-column data frame into a data frame of only one column (the result of our mapping function).  Finally, we take the sum of that value within each group.  We end by making a histogram of the resulting object, which has a single value for each group.
@@ -107,10 +104,10 @@ Let's describe what's going here for the sake of completeness.  We start by taki
 
 Bringing this all together, Bamboo makes it easy to manipulate and plot data:
 
-    wrap(df) \
+    df \
         .groupby('group') \
-        .map_groups(lambda x: x.feature1 + x.feature1, name='feature_sum') \
-        .hist(ax=plt.gca(), bins=np.arange(-5, 5, 0.5), alpha=0.5)
+        .pipe(map_groups, lambda x: x.feature1 + x.feature1, name='feature_sum') \
+        .pipe(hist, ax=plt.gca(), bins=np.arange(-5, 5, 0.5), alpha=0.5)
 
 ![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_manipulation_hist.png)
 
@@ -130,34 +127,35 @@ A convenient way to manipulate data for the purpose of classification or regress
     
 One can also create a ModelingData directly from a single DataFrame
 
-	df = pd.read_csv("data.csv")
-	data = bamboo.modeling.ModelingData.from_dataframe(df, target='target')
-	
-	
+df = pd.read_csv("data.csv")
+data = bamboo.modeling.ModelingData.from_dataframe(df, target='target')
+
+
 The advantage is that features and targets can be encapsulated into a single package and manipulated as a single object.  It also comes with a number of helper functions for common modeling tasks.
 
-	numeric_data = data.numeric_features()
-	
-	data.hist('feature1', bins=np.arange(0.0, 10.0, 1.0))
-	
-	clf = RandomForestClassifer()
-	data.fit(clf)
-	
+```
+numeric_data = data.numeric_features()
+
+data.hist('feature1', bins=np.arange(0.0, 10.0, 1.0))
+
+clf = RandomForestClassifer()
+data.fit(clf)
+```
 
 In particular, it makes it easy to do cross validation
 
-    training, testing = data.train_test_split()
-    
-    training_balanced = train.get_balanced()
+```
+training, testing = data.train_test_split()
 
-	clf = RandomForestClassifier
-	
-	training_balanced.fit(clf)
-    
-    print testing.get_classifier_performance_summary(clf, target='classA')
-    
-    # {'f1': 0.53846153846153844, 'target': 0.0, 'sensiticity': 0.5, 'recall': 0.5, 'false_positive_rate': 0.58333333333333337, 'false_positives': 5.0, 'precision': 0.58333333333333337, 'true_positives': 7.0, 'false_negatives': 7.0, 'true_positive_rate': 0.41666666666666669, 'specificity': 0.5, 'threshold': 0.0, 'true_negatives': 5.0, 'accuracy': 1.0}
-    
-    
+training_balanced = train.get_balanced()
+
+clf = RandomForestClassifier
+
+training_balanced.fit(clf)
+
+print testing.get_classifier_performance_summary(clf, target='classA')
+
+# {'f1': 0.53846153846153844, 'target': 0.0, 'sensiticity': 0.5, 'recall': 0.5, 'false_positive_rate': 0.58333333333333337, 'false_positives': 5.0, 'precision': 0.58333333333333337, 'true_positives': 7.0, 'false_negatives': 7.0, 'true_positive_rate': 0.41666666666666669, 'specificity': 0.5, 'threshold': 0.0, 'true_negatives': 5.0, 'accuracy': 1.0}
+```
 
 For a more detailed example, see the documentation [here](docs/modeling.md).

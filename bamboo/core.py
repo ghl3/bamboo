@@ -10,7 +10,6 @@ from bamboo import groups
 from bamboo import series_groups
 
 from bamboo import plotting
-from bamboo import BambooObjects
 
 # This module defines the core API and handles
 # polymorphic dispatch routing to various
@@ -35,7 +34,6 @@ def _(dfgb, n=5, ngroups=5):
 @singledispatch
 def hist(df, *args, **kwargs):
     pass
-#    return df.hist(*args, **kwargs)
 
 
 @hist.register(DataFrame)
@@ -50,7 +48,7 @@ def _(sgb, *args, **kwargs):
 
 @hist.register(DataFrameGroupBy)
 def _(dfgb, *args, **kwargs):
-    return groups.hist(dfgb, *args, **kwargs)  # plotting._frame_hist(sgb, *args, **kwargs)
+    return groups.hist(dfgb, *args, **kwargs)
 
 
 @singledispatch
@@ -60,16 +58,12 @@ def scatter(df, x, y, **kwargs):
 
 @scatter.register(DataFrame)
 def _(df, x, y, **kwargs):
-    return frames.scatter(df, x, y, **kwargs)  # plotting._frame_scatterscatter(df, x, y, **kwargs)
+    return frames.scatter(df, x, y, **kwargs)
 
 
 @scatter.register(DataFrameGroupBy)
 def _(dfgb, x, y, **kwargs):
-    return groups.scatter(dfgb, x, y, **kwargs)  # plotting._groups_scatter(df, x, y, **kwargs)
-
-
-def wrap(*args, **kwargs):
-    return BambooObjects.wrap(*args, **kwargs)
+    return groups.scatter(dfgb, x, y, **kwargs)
 
 
 def hist_all(*args, **kwargs):
