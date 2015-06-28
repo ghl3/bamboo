@@ -4,7 +4,6 @@ from pandas.core.groupby import DataFrameGroupBy
 from pandas.core.groupby import SeriesGroupBy
 
 from singledispatch import singledispatch
-from inspect import getmembers, isfunction
 
 from bamboo import frames
 from bamboo import groups

@@ -1,4 +1,13 @@
 
+import numpy as np
+import pandas as pd
+
+from sklearn.cross_validation import StratifiedKFold
+from sklearn.ensemble import RandomForestClassifier
+
+from tools import get_scores
+
+import bamboo
 
 class ScoreFeature():
 
@@ -30,7 +39,7 @@ class ScoreFeature():
 def print_distribution(clf, features, targets):
     score_groups = get_scores(targets, features, clf, StratifiedKFold(targets, n_folds=2))
     bins = np.arange(0, 1.0, .05)
-    hist(score_groups[0].groupby('targets'), var='score', normed=True, alpha=0.5, bins=bins)
+    bamboo.hist(score_groups[0].groupby('targets'), var='score', normed=True, alpha=0.5, bins=bins)
 
 
 def feature_importances(importances, features):

@@ -1,4 +1,5 @@
 
+import pandas as pd
 
 def arff_to_df(arff):
     rows = []
