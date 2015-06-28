@@ -1,6 +1,7 @@
 
 from nose.tools import *
 from bamboo.groups import *
+import bamboo.plotting
 
 from helpers import *
 
@@ -90,7 +91,7 @@ def test_hist_functions():
 @plotting
 def test_scatter():
     dfgb = create_test_df_v2().groupby('group')
-    scatter(dfgb, 'feature1', 'feature2')
+    bamboo.plotting._groups_scatter(dfgb, 'feature1', 'feature2')
 
 
 @plotting

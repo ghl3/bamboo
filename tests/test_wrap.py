@@ -76,7 +76,7 @@ def test_apply_groups():
     return wrap(df)\
         .groupby('group')\
         .apply_groups(thing, lambda x: x.feature1 - x.feature2)\
-        .mean()\
-        .scatter('thing', '<lambda>_1')
+        .mean()
+        #.scatter('thing', '<lambda>_1')
 
 

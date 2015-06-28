@@ -51,12 +51,12 @@ def scatter(df, x, y, **kwargs):
 
 @scatter.register(DataFrame)
 def _(df, x, y, **kwargs):
-    return frames.scatter(df, x, y, **kwargs)
+    return plotting._frame_scatterscatter(df, x, y, **kwargs)
 
 
 @scatter.register(GroupBy)
 def _(df, x, y, **kwargs):
-    return groups.scatter(df, x, y, **kwargs)
+    return plotting._groups_scatter(df, x, y, **kwargs)
 
 
 def wrap(*args, **kwargs):

@@ -200,6 +200,33 @@ def _frame_hist(dfgb, var=None, *args, **kwargs):
                 print e
 
 
+def _groups_scatter(dfgb, x, y, **kwargs):
+    """
+    Takes a grouped data frame and draws a scatter
+    plot of the suppied variables wtih a different
+    color for each group
+    """
+    ax = plt.gca()
+    color_cycle = ax._get_lines.color_cycle
+    for (color, (key, grp)) in zip(color_cycle, dfgb):
+        plt.scatter(grp[x], grp[y], color=color, label=key, **kwargs)
+    plt.legend(loc='best')
+    plt.xlabel(x)
+    plt.ylabel(y)
+
+
+def _frames_scatter(df, x, y, **kwargs):
+    """
+    Takes a grouped data frame and draws a scatter
+    plot of the suppied variables wtih a different
+    color for each group
+    """
+    ax = plt.gca()
+    plt.scatter(df[x], df[y], **kwargs)
+    plt.xlabel(x)
+    plt.ylabel(y)
+
+
 def _get_variable_binning(var, nbins=10, int_bound=40):
     """
     Get the binning of a variable.

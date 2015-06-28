@@ -254,16 +254,3 @@ def boxplot(df, x, y, bins=None):
         boxplot_frame_groupby(df.groupby(x)[y], subplots=False, return_type='dict')
     else:
         boxplot_frame_groupby(group_by_binning(df, x, bins)[y], subplots=False, return_type='dict')
-
-
-# TODO: Use python single dispatch (pep 443)
-def scatter(df, x, y, **kwargs):
-    """
-    Takes a grouped data frame and draws a scatter
-    plot of the suppied variables wtih a different
-    color for each group
-    """
-    ax = plt.gca()
-    plt.scatter(df[x], df[y], **kwargs)
-    plt.xlabel(x)
-    plt.ylabel(y)

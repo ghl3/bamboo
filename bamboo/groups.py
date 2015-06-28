@@ -17,13 +17,9 @@ from math import floor, ceil
 
 
 
-
 """
-
 Functions that act on data frame group by objects
-
 """
-
 
 def filter_groups(dfgb, filter_function, on_index=False):
     """
@@ -157,35 +153,9 @@ def apply_groups(dfgb, *args, **kwargs):
     return pd.DataFrame(res).groupby(dfgb.grouper)
 
 
-# @singledispatch
-# def hist(dfgb, *args, **kwargs):
-#     """
-#     Takes a data frame (grouped by a variable)
-#     and plots histograms of the variable 'var'
-#     for each of the groups.
-#     """
-#     raise NotImplementedError()
-
-
-# @hist.register(SeriesGroupBy)
-# def _(sgb, *args, **kwargs):
-#     plotting._series_hist(sgb, *args, **kwargs)
-
-
-# @hist.register(DataFrameGroupBy)
-# def _(dfgb, var=None, *args, **kwargs):
-#     if var is not None:
-#         plotting._series_hist(dfgb[var], *args, **kwargs)
-#     else:
-#         for (var, series) in dfgb._iterate_column_groupbys():
-#             plt.figure()
-#             try:
-#                 plotting._series_hist(series, *args, **kwargs)
-#                 plt.xlabel(var)
-#             except TypeError as e:
-#                 print "Failed to plot %s" % var
-#                 print e
-
+#
+# Plotting
+#
 
 
 def hist_functions(dfgb, *args, **kwargs):
@@ -211,21 +181,6 @@ def hist_functions(dfgb, *args, **kwargs):
         plt.subplot(rows, cols, i+1)
         plotting._series_hist(map_groups(dfgb, function), **kwargs)
         plt.xlabel(function.__name__)
-
-
-def scatter(dfgb, x, y, **kwargs):
-    """
-    Takes a grouped data frame and draws a scatter
-    plot of the suppied variables wtih a different
-    color for each group
-    """
-    ax = plt.gca()
-    color_cycle = ax._get_lines.color_cycle
-    for (color, (key, grp)) in zip(color_cycle, dfgb):
-        plt.scatter(grp[x], grp[y], color=color, label=key, **kwargs)
-    plt.legend(loc='best')
-    plt.xlabel(x)
-    plt.ylabel(y)
 
 
 def stacked_counts_plot(dfgb, category, ratio=False, **kwargs):
