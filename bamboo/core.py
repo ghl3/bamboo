@@ -15,7 +15,6 @@ from bamboo import plotting
 # polymorphic dispatch routing to various
 # functions throughout the bamboo code
 
-
 @singledispatch
 def head(df, n=5):
     """

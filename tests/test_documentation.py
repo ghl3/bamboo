@@ -8,6 +8,9 @@ import pandas as pd
 
 from sklearn.datasets import make_classification
 
+from nose.tools import nottest
+
+
 
 def take(iterable, n):
     "Return first n items of the iterable as a list"
@@ -79,20 +82,25 @@ def test_scatter():
     plt.savefig('tests/images/readme_scatter.png')
 
 
+@nottest
+def test_manipulation_1():
+    df.groupby('group') \
+      .pipe(filter_groups, lambda x: x['group'].mean() > 0) \
+      .pipe(sorted_groups, lambda x: x['feature2'].mean()) \
+      .pipe(map_groups, lambda x: x['feature1'].mean()) \
+      .sum()
 
 
-def test_manipulation():
+@nottest
+def test_manipulation_2():
 
     df = create_dataset()
 
     plt.clf()
 
-    from bamboo import wrap
-
-    wrap(df) \
-        .groupby('class') \
-        .map_groups(lambda x: x.feature1 + x.feature1, name='feature_sum') \
-        .hist(ax=plt.gca(), bins=np.arange(-5, 5, 0.5), alpha=0.5)
+    df.groupby('class') \
+      .pipe(map_groups, lambda x: x.feature1 + x.feature1, name='feature_sum') \
+      .pipe(hist, ax=plt.gca(), bins=np.arange(-5, 5, 0.5), alpha=0.5)
 
     plt.savefig('tests/images/readme_manipulation_hist.png')
 
