@@ -231,7 +231,8 @@ def save_grouped_hists(dfgb, output_file, title=None, *args, **kwargs):
     plotting._save_plots(dfgb, plotting._series_hist, output_file, title, *args, **kwargs)
 
 
-def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12, 4), **kwargs):
+def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12, 4),
+             title_map=None, ylabel_map=None, **kwargs):
 
     columns = dfgb.obj.columns
 
@@ -250,5 +251,10 @@ def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12,
         except Exception as e:
             print e
         plt.xlabel(feature)
+
+        if ylabel_map and feature in ylabel_map:
+            plt.ylabel(ylabel_map[feature])
+        if title_map and feature in title_map:
+            plt.title(title_map[feature])
 
     plt.tight_layout()
