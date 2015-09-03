@@ -20,7 +20,7 @@ if sys.argv[-1] == "publish":
 setup(
     name="pandas-bamboo",
     packages=["bamboo"],
-    version='0.1.3',
+    version='0.1.4',
     author="George Herbert Lewis",
     author_email="ghl227@gmail.com",
     license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
