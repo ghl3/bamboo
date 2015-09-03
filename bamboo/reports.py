@@ -5,7 +5,7 @@ from subplots import PdfSubplots
 
 import bamboo.plotting
 
-def add_title_to_pdf(pdf, title, figsize=(30, 20),
+def add_title_page_to_pdf(pdf, title, figsize=(30, 20),
                      end_page=True):
     fig = plt.figure(figsize=figsize)
     plt.axis('off')
@@ -15,8 +15,8 @@ def add_title_to_pdf(pdf, title, figsize=(30, 20),
     if end_page:
         pdf.savefig()
 
-
 def add_subplots_to_pdf(pdf, dfgb, plot_func,
+                        var_func=None,
                         nrows=3, ncols=3, figsize=(30, 20),
                         end_page=True,
                         *args, **kwargs):
@@ -33,6 +33,8 @@ def add_subplots_to_pdf(pdf, dfgb, plot_func,
         subplots.next_subplot()
         try:
             plot_func(series, *args, **kwargs)
+            if var_func:
+                var_func(var)
             plt.xlabel(var)
             subplots.end_iteration()
         except:
