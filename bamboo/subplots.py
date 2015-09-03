@@ -35,13 +35,13 @@ class PdfSubplots:
         if self.idx % self.num_subplots == self.num_subplots - 1:
             plt.tight_layout()
             self.pdf.savefig()
-            # close()
+
 
     def finalize(self):
         if self.idx % self.num_subplots != self.num_subplots - 1:
             plt.tight_layout()
             self.pdf.savefig()
-            # close()
+
 
 
 def print_subplot_info():

@@ -38,29 +38,9 @@ def _draw_stacked_plot(dfgb, **kwargs):
     df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
 
 
-def _save_plots(dfgb, plot_func, output_file, *args, **kwargs):
-    """
-    Take a grouped dataframe and save a pdf of
-    the histogrammed variables in that dataframe.
-    TODO: Can we abstract this behavior...?
-    """
-
+def plot_all_and_save(dfgb, plot_func, output_file, *args, **kwargs):
     pdf = PdfPages(output_file)
-
-    subplots = PdfSubplots(pdf, 3, 3)
-
-    for (var, series) in dfgb._iterate_column_groupbys():
-
-        subplots.next_subplot()
-        try:
-            plot_func(series, *args, **kwargs)
-            plt.xlabel(var)
-            subplots.end_iteration()
-        except:
-            subplots.skip_subplot()
-
-    subplots.finalize()
-
+    add_subplots_to_odf(pdf, dfgb, plot_func, *args, **kwargs)
     pdf.close()
 
 
@@ -263,3 +243,23 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     bins = np.arange(nbins + 1) / nbins * (var_max - var_min) + var_min
 
     return bins
+
+
+
+from pandas.tools.plotting import table
+
+
+def plot_table(df, width=0.3, height=0.15, size=12):
+
+    table(plt.gca(), df, loc='center') #,
+          #colWidths=[0.2, 0.2, 0.2])
+
+    # Grab the most recent table from the current axis
+    the_table = plt.gca().tables[-1]
+
+    for cell in the_table.get_celld().values():
+        cell.set_height(height)
+        cell.set_width(width)
+        cell.set_fontsize(size)
+
+    return the_table
