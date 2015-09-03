@@ -249,6 +249,12 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
 from pandas.tools.plotting import table
 
 
+
+def plot_title(title):
+    plt.text(0.5, 0.5, title, ha='center', va='center',
+             size=48)
+
+
 def plot_table(df, width=0.3, height=0.15, size=12):
 
     table(plt.gca(), df, loc='center') #,
