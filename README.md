@@ -45,6 +45,22 @@ One can also visualize the relationship between features using a scatter plot wi
 
 ![alt tag](https://raw.githubusercontent.com/ghl3/bamboo/master/images/readme_scatter.png)
 
+One can easily create a table containing plots of every column in a DataFrame.  Simply pass a DataFrameGroupBy to the hist_all function:
+
+bamboo.hist_all(df.groupby('group'), alpha=0.5)
+
+One can pass in any arguments that the normal 'hist' function takes.
+
+If one wants to have more control over how each plot in the table looks, one can pass a specific function that creates each plot:
+
+    def plot_func(sgb):
+        hist(sgb, alpha=0.5, autobin=True)
+	    plt.title("Title: {}".format(sgb.name))
+	
+    bamboo_hist_all(df.groupby('group'), plot_func=plot_func)
+
+If one calls hist_all with  additional keyword-arguments, they will be automatically forwarded to the supplied plot_func (which may or may not be written to accept such arguments, that's up to the user).
+
 
 Data Manipulation
 -------
