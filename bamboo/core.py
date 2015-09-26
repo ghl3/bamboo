@@ -10,6 +10,7 @@ from bamboo import groups
 from bamboo import series_groups
 
 from bamboo import plotting
+from bamboo import reports
 
 # This module defines the core API and handles
 # polymorphic dispatch routing to various
@@ -69,5 +70,5 @@ def hist_all(*args, **kwargs):
     return groups.hist_all(*args, **kwargs)
 
 
-def save_all(*args, **kwargs):
-    return plotting._save_all(*args, **kwargs)
+def save_report(*args, **kwargs):
+    return reports.save_report(*args, **kwargs)

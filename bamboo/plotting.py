@@ -7,6 +7,8 @@ import numpy as np
 from subplots import PdfSubplots
 from matplotlib.backends.backend_pdf import PdfPages
 
+from pandas.tools.plotting import table
+
 from helpers import NUMERIC_TYPES
 
 import itertools
@@ -36,12 +38,6 @@ def _draw_stacked_plot(dfgb, **kwargs):
 
     df_for_plotting = pd.DataFrame(series_dict)
     df_for_plotting.plot(kind="bar", stacked=True, ax=ax, **kwargs)
-
-
-def plot_all_and_save(dfgb, plot_func, output_file, *args, **kwargs):
-    pdf = PdfPages(output_file)
-    add_subplots_to_odf(pdf, dfgb, plot_func, *args, **kwargs)
-    pdf.close()
 
 
 def _series_hist(sgb, ax=None, normed=False, normalize=False, autobin=False,
@@ -110,9 +106,6 @@ def _series_hist_float(sgb, ax=None, autobin=False, normed=False, normalize=Fals
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        # if len(srs.values)==1 and 'bins' not in kwargs:
-        #    kwargs['bins'] = [srs.values[0] - 0.05, srs.values[0] + 0.05]
-
         srs.hist(ax=ax, color=color, label=str(label), normed=normed, bins=bins, **kwargs)
         series_map[label] = srs
 
@@ -168,6 +161,38 @@ def _grouped_hist(dfgb, var=None, *args, **kwargs):
             except TypeError as e:
                 print "Failed to plot %s" % var
                 print e
+
+
+
+def _plot_and_decorate(srs, binning_map=None, title_map=None, ylabel_map=None,
+              *args, **kwargs):
+    """
+    A function that plots a series and adds configurable decoration
+    to the plot, including labels and titles.
+
+    This is best used by functions that iterate over many plots
+    and want to draw them in a consistent way
+    """
+
+    feature = srs.name
+
+    if binning_map and feature in binning_map:
+        kwargs['bins'] = binning_map[feature]
+        kwargs.pop('autobin')
+    else:
+        kwargs['autobin'] = True
+
+    _series_hist(srs, *args, **kwargs)
+
+    if ylabel_map and feature in ylabel_map:
+        plt.ylabel(ylabel_map[feature])
+
+    if title_map and feature in title_map:
+        plt.title(title_map[feature])
+
+    plt.xlabel(feature)
+
+
 
 
 def _frame_scatter(df, x, y, **kwargs):
@@ -243,12 +268,6 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     bins = np.arange(nbins + 1) / nbins * (var_max - var_min) + var_min
 
     return bins
-
-
-
-from pandas.tools.plotting import table
-
-
 
 def plot_title(title):
     plt.text(0.5, 0.5, title, ha='center', va='center',

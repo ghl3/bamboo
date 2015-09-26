@@ -231,30 +231,46 @@ def save_grouped_hists(dfgb, output_file, title=None, *args, **kwargs):
     plotting._save_plots(dfgb, plotting._series_hist, output_file, title, *args, **kwargs)
 
 
-def hist_all(dfgb, shape=None, binning_map=None, subplot_columns=3, figsize=(12, 4),
-             title_map=None, ylabel_map=None, **kwargs):
+def hist_all(dfgb, n_columns=3, figsize=(12, 4), plot_func=None,
+             *args, **kwargs):
+    """
+    dfgb - A grouped DataFrame.  Every column in the group will be plotted
+
+    n_columns - The number of columns to show (the number of rows is determined
+      by the number of columns variables in the input DataFrameGroupBy
+
+    figsize - The size of each figure
+
+    plot_func - A function that takes a SeriesGroupBy object and plots it.
+      One can optionally supply a specific function to plot as one pleases.
+      All additional args and kwargs for hist_all will be passed to plot_func.
+
+      If one chooses to not supply a specific function, the default _plot_and_decorate
+      function will be used.  The default _plot_and_decorate function accepts
+      the following arguments (in addition to others):
+
+      - binning_map: A dictionary of {name: [binning]}, where the 'name' is the name
+        of each feature and the given binning array is used as the binning of that feature
+      - title_map: A dictionary of {name: title} for each feature
+      - ylabel_map: A dictionary of {name: ylabel} for each feature
+    """
 
     columns = dfgb.obj.columns
 
+    if plot_func is None:
+        plot_func = plotting._plot_and_decorate
+
     for i, feature in enumerate(columns):
 
-        if i % subplot_columns == 0:
+        if i % n_columns == 0:
             fig = plt.figure(figsize=figsize)
 
-        plt.subplot(1, subplot_columns, (i % subplot_columns) + 1)
+        plt.subplot(1, n_columns, (i % n_columns) + 1)
 
         try:
-            if binning_map and feature in binning_map:
-                plotting._grouped_hist(dfgb, feature, bins=binning_map[feature], **kwargs)
-            else:
-                plotting._grouped_hist(dfgb, feature, autobin=True, **kwargs)
+            sgb = dfgb[feature]
+            plot_func(sgb, *args, **kwargs)
         except Exception as e:
             print e
-        plt.xlabel(feature)
-
-        if ylabel_map and feature in ylabel_map:
-            plt.ylabel(ylabel_map[feature])
-        if title_map and feature in title_map:
-            plt.title(title_map[feature])
 
     plt.tight_layout()

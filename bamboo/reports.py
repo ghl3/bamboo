@@ -1,44 +1,61 @@
 
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 
 from subplots import PdfSubplots
 
 import bamboo.plotting
 
+
+def save_report(dfgb, name, title=None, plot_func=None,
+                *args, **kwargs):
+
+    with PdfPages(name) as pdf:
+        if title:
+            add_title_page_to_pdf(pdf, title)
+
+        add_subplots_to_pdf(pdf, dfgb, plot_func=plot_func,
+                            *args, **kwargs)
+
+
 def add_title_page_to_pdf(pdf, title, figsize=(30, 20),
                           end_page=True,
                           *args, **kwargs):
+
     fig = plt.figure(figsize=figsize)
     plt.axis('off')
     bamboo.plotting.plot_title(title, *args, **kwargs)
-    #plt.text(0.5, 0.5, title, ha='center', va='center',
-    #         size=48)
 
     if end_page:
         pdf.savefig()
 
-def add_subplots_to_pdf(pdf, dfgb, plot_func,
-                        var_func=None,
+
+def add_subplots_to_pdf(pdf, dfgb, plot_func=None,
                         nrows=3, ncols=3, figsize=(30, 20),
                         end_page=True,
                         skip_if_exception=False,
                         *args, **kwargs):
     """
+    Take a pdf and a grouped dataframe and save
     Take a grouped dataframe and save a pdf of
     the histogrammed variables in that dataframe.
+
+    plot_func - A function that takes the series and a list of
+    arguments and kwargs and plots the given function
+
     TODO: Can we abstract this behavior...?
     """
 
     subplots = PdfSubplots(pdf, nrows, ncols, figsize=figsize)
+
+    if plot_func is None:
+        plot_func = bamboo.plotting._plot_and_decorate
 
     for (var, series) in dfgb._iterate_column_groupbys():
 
         subplots.next_subplot()
         try:
             plot_func(series, *args, **kwargs)
-            if var_func:
-                var_func(var)
-            plt.xlabel(var)
             subplots.end_iteration()
         except Exception as e:
             if skip_if_exception:
