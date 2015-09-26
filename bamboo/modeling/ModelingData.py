@@ -152,7 +152,7 @@ class ModelingData():
 
     def hist_all(self, shape=None, binning_map=None, figsize=None, **kwargs):
 
-        fig = plt.figure(figsize=figsize)
+        plt.figure(figsize=figsize)
 
         if shape is None:
             x = 3
@@ -298,8 +298,8 @@ class ModelingData():
         false_positive_rate = (1.0 - specificity)
 
         accuracy = (num_true_positives + num_true_negatives) / num
-        f1 = 2 * num_true_positives / (2 * num_true_positives + num_false_positives +
-                                       num_false_negatives) if 2 * num_true_positives + num_false_positives + num_false_negatives else 0.0
+        f1 = 2 * num_true_positives / (2 * num_true_positives + num_false_positives + num_false_negatives) \
+            if 2 * num_true_positives + num_false_positives + num_false_negatives else 0.0
 
         return {'threshold': threshold,
                 'target': target,

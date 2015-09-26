@@ -10,7 +10,7 @@ def plot_auc_curve(estimator, X_test, y_test):
     y_score = estimator.predict_proba(X_test)
     scorer = check_scoring(estimator, scoring=None)
 
-    test_score = scorer(estimator, X_test, y_test)
+    scorer(estimator, X_test, y_test)
 
     fpr = dict()
     tpr = dict()

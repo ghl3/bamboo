@@ -263,7 +263,7 @@ def hist_all(dfgb, n_columns=3, figsize=(12, 4), plot_func=None,
     for i, feature in enumerate(columns):
 
         if i % n_columns == 0:
-            fig = plt.figure(figsize=figsize)
+            plt.figure(figsize=figsize)
 
         plt.subplot(1, n_columns, (i % n_columns) + 1)
 
@@ -273,4 +273,4 @@ def hist_all(dfgb, n_columns=3, figsize=(12, 4), plot_func=None,
         except Exception as e:
             print e
 
-    plt.tight_layout()
+

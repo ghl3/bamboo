@@ -4,9 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-from subplots import PdfSubplots
-from matplotlib.backends.backend_pdf import PdfPages
-
 from pandas.tools.plotting import table
 
 from helpers import NUMERIC_TYPES
@@ -14,7 +11,6 @@ from helpers import NUMERIC_TYPES
 import itertools
 
 
-# TODO: Implement this for floats
 def _draw_stacked_plot(dfgb, **kwargs):
     """
     Draw a vertical bar plot of multiple series
@@ -23,8 +19,6 @@ def _draw_stacked_plot(dfgb, **kwargs):
     Deals with some annoying pandas issues when
     drawing a DataFrame
     """
-
-    #color_cycle = ax._get_lines.color_cycle
 
     if 'ax' in kwargs:
         ax = kwargs.pop('ax')
@@ -163,9 +157,8 @@ def _grouped_hist(dfgb, var=None, *args, **kwargs):
                 print e
 
 
-
 def _plot_and_decorate(srs, binning_map=None, title_map=None, ylabel_map=None,
-              *args, **kwargs):
+                       *args, **kwargs):
     """
     A function that plots a series and adds configurable decoration
     to the plot, including labels and titles.
@@ -191,8 +184,7 @@ def _plot_and_decorate(srs, binning_map=None, title_map=None, ylabel_map=None,
         plt.title(title_map[feature])
 
     plt.xlabel(feature)
-
-
+    plt.tight_layout()
 
 
 def _frame_scatter(df, x, y, **kwargs):
@@ -201,7 +193,6 @@ def _frame_scatter(df, x, y, **kwargs):
     plot of the suppied variables wtih a different
     color for each group
     """
-    ax = plt.gca()
     plt.scatter(df[x], df[y], **kwargs)
     plt.xlabel(x)
     plt.ylabel(y)
@@ -269,6 +260,7 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
 
     return bins
 
+
 def plot_title(title):
     plt.text(0.5, 0.5, title, ha='center', va='center',
              size=48)
@@ -276,8 +268,7 @@ def plot_title(title):
 
 def plot_table(df, width=0.3, height=0.15, size=12):
 
-    table(plt.gca(), df, loc='center') #,
-          #colWidths=[0.2, 0.2, 0.2])
+    table(plt.gca(), df, loc='center')
 
     # Grab the most recent table from the current axis
     the_table = plt.gca().tables[-1]

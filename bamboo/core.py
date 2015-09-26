@@ -9,12 +9,12 @@ from bamboo import frames
 from bamboo import groups
 from bamboo import series_groups
 
-from bamboo import plotting
 from bamboo import reports
 
 # This module defines the core API and handles
 # polymorphic dispatch routing to various
 # functions throughout the bamboo code
+
 
 @singledispatch
 def head(df, n=5):

@@ -22,7 +22,7 @@ def add_title_page_to_pdf(pdf, title, figsize=(30, 20),
                           end_page=True,
                           *args, **kwargs):
 
-    fig = plt.figure(figsize=figsize)
+    plt.figure(figsize=figsize)
     plt.axis('off')
     bamboo.plotting.plot_title(title, *args, **kwargs)
 
@@ -36,14 +36,21 @@ def add_subplots_to_pdf(pdf, dfgb, plot_func=None,
                         skip_if_exception=False,
                         *args, **kwargs):
     """
-    Take a pdf and a grouped dataframe and save
-    Take a grouped dataframe and save a pdf of
-    the histogrammed variables in that dataframe.
+    Take a pdf and a grouped dataframe and add plots of each column
+    in that dataframe to the given pdf.
 
-    plot_func - A function that takes the series and a list of
-    arguments and kwargs and plots the given function
+    plot_func - A function that takes a SeriesGroupBy object and plots it.
+      One can optionally supply a specific function to plot as one pleases.
+      All additional args and kwargs for hist_all will be passed to plot_func.
 
-    TODO: Can we abstract this behavior...?
+      If one chooses to not supply a specific function, the default _plot_and_decorate
+      function will be used.  The default _plot_and_decorate function accepts
+      the following arguments (in addition to others):
+
+      - binning_map: A dictionary of {name: [binning]}, where the 'name' is the name
+        of each feature and the given binning array is used as the binning of that feature
+      - title_map: A dictionary of {name: title} for each feature
+      - ylabel_map: A dictionary of {name: ylabel} for each feature
     """
 
     subplots = PdfSubplots(pdf, nrows, ncols, figsize=figsize)
