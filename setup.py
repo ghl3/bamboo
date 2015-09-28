@@ -20,7 +20,7 @@ if sys.argv[-1] == "publish":
 setup(
     name="pandas-bamboo",
     packages=["bamboo"],
-    version='0.1.4',
+    version='0.1.5',
     author="George Herbert Lewis",
     author_email="ghl227@gmail.com",
     license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
@@ -28,6 +28,6 @@ setup(
     url = 'https://github.com/ghl3/bamboo',
     download_url = 'https://github.com/ghl3/bamboo/tarball/0.1.2',
     install_requires=[
-        'pandas', 'numpy', 'matplotlib'
+        'pandas', 'numpy', 'matplotlib', 'singledispatch'
     ],
 )
