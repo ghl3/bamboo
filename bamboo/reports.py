@@ -10,6 +10,9 @@ import bamboo.plotting
 def save_report(dfgb, name, title=None, plot_func=None,
                 *args, **kwargs):
 
+    if plot_func is None:
+        plot_func = bamboo.plotting._plot_and_decorate
+
     with PdfPages(name) as pdf:
         if title:
             add_title_page_to_pdf(pdf, title)
