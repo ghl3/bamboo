@@ -48,3 +48,7 @@ def convert_nominal_to_int(srs, return_dict=False):
         return (result, d)
     else:
         return result
+
+
+def num_non_null_elements(srs):
+    return len(srs[pd.notnull(srs)])

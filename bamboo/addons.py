@@ -51,10 +51,12 @@ def _create_summary_table(series_map, bins=None, **kwargs):
         else:
             not_shown = len(srs[(pd.isnull(srs))])
 
-        pct_shown = "{number:.{digits}f}%".format(number=(total_num - not_shown) / total_num * 100.0, digits=1)
+        percent_shown = (total_num - not_shown) / total_num * 100.0 if total_num > 0 else 0
+
+        pct_string = "{number:.{digits}f}%".format(number=percent_shown, digits=1)
 
         row_labels.append(group)
-        rows.append([total_num, not_null, pct_shown])
+        rows.append([total_num, not_null, pct_string])
 
     table = plt.table(cellText=rows,
                       rowLabels=row_labels,

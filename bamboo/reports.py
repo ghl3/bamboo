@@ -68,6 +68,7 @@ def add_subplots_to_pdf(pdf, dfgb, plot_func=None,
             plot_func(series, *args, **kwargs)
             subplots.end_iteration()
         except Exception as e:
+            print "Encountered error adding subplot for variable: {}".format(var)
             if skip_if_exception:
                 subplots.skip_subplot()
             else:

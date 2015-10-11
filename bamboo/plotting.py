@@ -10,6 +10,8 @@ from helpers import NUMERIC_TYPES
 
 import itertools
 
+from helpers import num_non_null_elements
+
 
 def _draw_stacked_plot(dfgb, **kwargs):
     """
@@ -53,6 +55,8 @@ def _series_hist(sgb, ax=None, normed=False, normalize=False, autobin=False,
     normed_or_normalize = normed or normalize
 
     if sgb.obj.dtype in NUMERIC_TYPES:
+        # Remove variables that only apply to nominal
+        kwargs.pop("max_nominal_values")
         plot_result = _series_hist_float(sgb, ax, normed=normed_or_normalize, autobin=autobin, *args, **kwargs)
     else:
         plot_result = _series_hist_nominal(sgb, ax, normalize=normed_or_normalize, *args, **kwargs)
@@ -100,13 +104,19 @@ def _series_hist_float(sgb, ax=None, autobin=False, normed=False, normalize=Fals
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        srs.hist(ax=ax, color=color, label=str(label), normed=normed, bins=bins, **kwargs)
+        if num_non_null_elements(srs) > 0:
+            srs.hist(ax=ax, color=color, label=str(label), normed=normed, bins=bins, **kwargs)
+        else:
+            print "Warning: Series for value: {} {} is empty or has no non-null elements.  Not plotting".format(label,
+                                                                                                                srs.name)
+            ax.plot([], label=str(label))
         series_map[label] = srs
 
     return {'type': 'FLOAT', 'grouped': sgb, 'series_map': series_map, 'bins': bins}
 
 
-def _series_hist_nominal(sgb, ax=None, normalize=False, dropna=False, *args, **kwargs):
+def _series_hist_nominal(sgb, ax=None, normalize=False, dropna=False, max_nominal_values=None,
+                         *args, **kwargs):
     """
     Takes a pandas.SeriesGroupBy
     and plots histograms of the variable 'var'
@@ -123,6 +133,12 @@ def _series_hist_nominal(sgb, ax=None, normalize=False, dropna=False, *args, **k
     else:
         vals = [val for val in set(sgb.obj.values)]
 
+
+    plot = True
+    if max_nominal_values and len(vals) > max_nominal_values:
+        print "Skipping plotting of value {} because it has {} values, more than the allowed max of {}".format(sgb.name, len(vals), max_nominal_values)
+        plot = False
+
     series_map = {}
 
     for (color, (key, srs)) in zip(color_cycle, sgb):
@@ -135,8 +151,15 @@ def _series_hist_nominal(sgb, ax=None, normalize=False, dropna=False, *args, **k
         if 'color' in kwargs.keys():
             color = kwargs['color']
 
-        value_counts = srs.value_counts(normalize=normalize, dropna=dropna)[vals]
-        value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
+        if plot:
+            value_counts = srs.value_counts(normalize=normalize, dropna=dropna)[vals]
+            value_counts.plot(kind='bar', ax=ax, color=color, label=label, **kwargs)
+        else:
+            # We make an empty series so that the summary return value
+            # conveys that no values were plotted
+            # We plot it for the sake of a legend
+            srs = pd.Series([])
+            ax.plot(srs, label=label)
         series_map[label] = srs
 
     return {'type': 'NOMINAL', 'grouped': sgb, 'series_map': series_map}
@@ -229,6 +252,9 @@ def _get_variable_binning(var, nbins=10, int_bound=40):
     """
 
     var = var[np.isfinite(var)]
+
+    if len(var)==0:
+        return [0.0, 1.0]
 
     var_min = min(var)
     var_max = max(var)
